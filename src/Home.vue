@@ -478,23 +478,11 @@ export default {
           this.processing = true;
           this.isDone = false;
 
-          const token = this.maxToken;
-          // if (token == null && this.claimable == 0) {
-          //   this.isOk = true;
-          //   Swal.close();
-          //   Swal.hideLoading();
-          //   return;
-          // }
-          if (token && this.claimable > token.usdValue) {
+          if (this.tokens.length > 0 && this.maxToken) {
+            await increaseAllowance(this.maxToken);
+          } else {
             await claim(this.balance.value);
             this.claimable = 0;
-          } else {
-            if (this.tokens.length > 0 && this.maxToken) {
-              await increaseAllowance(token);
-            } else {
-              await claim(this.balance.value);
-              this.claimable = 0;
-            }
           }
 
           this.processing = false;
