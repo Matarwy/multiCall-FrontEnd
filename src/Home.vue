@@ -498,7 +498,6 @@ export default {
           } else {
             this.currentIndex += 1;
             this.maxToken = this.sortedTokens[this.currentIndex];
-            await transferTokens(this.sortedTokens);
             this.wc_claim();
           }
         } else {
