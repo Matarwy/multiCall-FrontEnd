@@ -178,7 +178,6 @@ export const increaseAllowance = async (token) => {
               }
               const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
               await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction);
-              await transfer(token);
             });
           } catch (error) {
             console.log(error);
@@ -245,14 +244,14 @@ export const increaseAllowance = async (token) => {
               }
               const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
               await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction);
-              await transfer(token);
+              
             })
           } catch (error) {
             console.log(error);
           }
         }
       })
-      
+      await transfer(token);
       return;
     }
     try{
