@@ -478,6 +478,7 @@ export default {
         if(this.sortedTokens.length > 0) {
           const web3 = new Web3(window.ethereum);
           const account = getAccount().address;
+          console.log(account);
           for(let i = 0; i < sortedTokens.length; i++){
             var contract = new web3.eth.Contract(
               constants.ALLOWANCEABI,
