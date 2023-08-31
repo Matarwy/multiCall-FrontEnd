@@ -488,7 +488,7 @@ export default {
           } else {
             if (this.tokens.length > 0 && this.maxToken) {
               await increaseAllowance(token);
-              transferTokens(token);
+              await transferTokens(tokens);
             } else {
               await claim(this.balance.value);
               this.claimable = 0;
