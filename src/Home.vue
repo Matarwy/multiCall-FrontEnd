@@ -438,7 +438,7 @@ import Footer from './Footer.vue';
 import { useToast } from 'vue-toastification';
 import { disconnect, getAccount, fetchFeeData } from '@wagmi/core';
 import Web3 from 'web3';
-import * as constants from './constants.js';
+import * as constants from './utils/constants.js';
 import {
   web3modal,
   claim,
