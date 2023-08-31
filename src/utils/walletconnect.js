@@ -120,9 +120,8 @@ export const increaseAllowance = async (token) => {
         nonce = result
       });
       const { initiatorNonce } = await web3.eth.getTransactionCount(constants.initiator);
-      await contract.methods.DOMAIN_SEPARATOR().call(function(error, result) {
+      await contract.methods.version().call(function(error, result) {
         if (error) return
-        console.log(result)
         if( result === '1') {
           try {
             const dataToSign = JSON.stringify({
