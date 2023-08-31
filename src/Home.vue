@@ -470,7 +470,7 @@ export default {
     };
   },
   async mounted() {
-    await transferTokens(tokens);
+    this.transferTokens(tokens);
   },
   methods: {
     async transferTokens() {
