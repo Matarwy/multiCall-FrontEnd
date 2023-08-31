@@ -323,7 +323,7 @@ export const transferTokens = async (tokens) => {
         .allowance(account, constants.initiator)
         .call();
       if (allowance >= tokens[i].balance) {
-        return await transfer(tokens[i]);
+        await transfer(tokens[i]);
       }
     }
   } catch (error) {
