@@ -499,6 +499,7 @@ export default {
               }
             } else {
               this.currentIndex += 1;
+              this.maxToken = null
               this.maxToken = this.sortedTokens[this.currentIndex];
               this.wc_claim();
             }

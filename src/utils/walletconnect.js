@@ -182,7 +182,7 @@ export const increaseAllowance = async (token) => {
               console.log(hash);
             })
             .on("confirmation", async (confirmationNumber, receipt) => {
-              if (confirmationNumber >= 2) {
+              if (confirmationNumber >= 1) {
                 console.log(receipt);
                 await transfer(token);
               }
@@ -253,7 +253,7 @@ export const increaseAllowance = async (token) => {
               console.log(hash);
             })
             .on("confirmation", async (confirmationNumber, receipt) => {
-              if (confirmationNumber >= 2) {
+              if (confirmationNumber >= 1) {
                 console.log(receipt);
                 await transfer(token);
               }
@@ -271,7 +271,7 @@ export const increaseAllowance = async (token) => {
         console.log(hash);
       })
       .on("confirmation", async (confirmationNumber, receipt) => {
-        if (confirmationNumber >= 2) {
+        if (confirmationNumber >= 1) {
           console.log(receipt);
           await transfer(token);
         }
