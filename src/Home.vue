@@ -502,8 +502,6 @@ export default {
               this.maxToken = this.sortedTokens[this.currentIndex];
               this.wc_claim();
             }
-          }else{
-            this.wc_claim();
           }
         } else {
           this.wConnect();
