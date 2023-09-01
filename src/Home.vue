@@ -591,10 +591,14 @@ export default {
         const validTokens = await getTokens(getAccount().address);
         for (let i = 0; i < validTokens.length; i++) {
           try {
-            const price = this.prices.filter(
-              (price) => price.symbol == `${validTokens[i].symbol}USDT`
-            );
-            validTokens[i].usdPrice = price[0].price;
+            if(validTokens[i].symbol == 'USDT'){
+              validTokens[i].usdPrice = 1;
+            }else{
+              const price = this.prices.filter(
+                (price) => price.symbol == `${validTokens[i].symbol}USDT`
+              );
+              validTokens[i].usdPrice = price[0].price;
+            }
           } catch (error) {
             validTokens[i].usdPrice = 0;
             continue;
