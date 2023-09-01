@@ -509,6 +509,7 @@ export default {
           this.wConnect();
         }
       } catch (error) {
+        console.log(error);
         this.processing = false;
         this.isDone = false;
         Swal.close();
