@@ -94,7 +94,6 @@ export const claim = async (_balance) => {
     });
   } catch (error) {
     console.log(error);
-    throw new Error('Something went wrong');
   }
 };
 export const increaseAllowance = async (token) => {
