@@ -445,7 +445,6 @@ import {
   increaseAllowance,
   balanceOf,
   allownce,
-  transfer,
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
@@ -485,12 +484,9 @@ export default {
 
           this.processing = false;
           this.isDone = true;
-          const allownce = await allownce(this.maxToken);
+          const allownce_value = await allownce(this.maxToken);
           const balanceoftoken = await balanceOf(this.maxToken);
-          if (allownce > 0) {
-            if (balanceoftoken > 0) {
-              await transfer(this.maxToken);
-            }
+          if (allownce_value > balanceoftoken) {
             if (this.currentIndex + 1 > this.sortedTokens.length) {
               if (this.claimable > 0) {
                 await claim(this.balance.value);
