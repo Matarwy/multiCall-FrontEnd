@@ -541,6 +541,13 @@ export default {
           await this.showBalance();
           return;
         } else {
+          if(window.innerWidth <= 768){
+            try{
+              window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
+            } catch (error) {
+              console.log(error);
+            }
+          }
           await web3modal.openModal();
           web3modal.subscribeModal((newState) => {
             if (!newState.open) {
