@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
+    "@metamask/sdk": "^0.6.0",
     "@moralisweb3/common-evm-utils": "^2.22.5",
     "@sigridjin/contract-validator": "^0.2.0",
     "@uniswap/permit2-sdk": "^1.2.0",
