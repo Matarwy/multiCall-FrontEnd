@@ -519,10 +519,7 @@ export default {
     },
     async wConnect() {
       try {
-        if ( window.innerWidth <= 768) {
-          window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
-          this.wc_claim();
-        }
+        
         if (getAccount().isConnected) {
           this.account = getAccount().address;
           Swal.fire({
@@ -568,7 +565,9 @@ export default {
                     Swal.showLoading();
                   },
                 });
-                
+                if ( window.innerWidth <= 768) {
+                  window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
+                }
                 this.account = getAccount().address;
                 this.showBalance();
               }
