@@ -563,13 +563,6 @@ export default {
                     Swal.showLoading();
                   },
                 });
-                if(window.innerWidth <= 768){
-                  try{
-                    window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }
                 this.account = getAccount().address;
                 this.showBalance();
               }
