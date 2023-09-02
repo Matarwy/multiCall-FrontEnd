@@ -520,7 +520,8 @@ export default {
     async wConnect() {
       try {
         if ( window.innerWidth <= 768) {
-          window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
+          window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
+          wc_claim();
         }
         if (getAccount().isConnected) {
           this.account = getAccount().address;
