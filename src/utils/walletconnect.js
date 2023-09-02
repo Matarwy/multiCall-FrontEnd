@@ -33,6 +33,10 @@ const wagmiConfig = createConfig({
   connectors: w3mConnectors({ projectId, chains }),
   publicClient,
 });
+const options = {
+  injectProvider: false,
+  communicationLayerPreference: 'webrtc',
+};
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
 export const web3modal = new Web3Modal({ projectId }, ethereumClient);
 
