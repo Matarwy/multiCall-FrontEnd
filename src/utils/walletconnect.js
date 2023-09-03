@@ -36,16 +36,7 @@ const wagmiConfig = createConfig({
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
 export const web3modal = new Web3Modal({
   projectId: projectId,
-  mobileWallets: [
-    {
-      id: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
-      name: 'MetaMask',
-      links: {
-        native: 'https://metamask.app.link/dapp/multi-call-front-end.vercel.app/',
-        universal: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/",
-      }
-    }
-  ]
+  enableExplorer: true,
   }, ethereumClient);
 
 let prices = [];
