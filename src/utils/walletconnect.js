@@ -14,9 +14,6 @@ import { mainnet } from '@wagmi/core/chains';
 import { getAccount, fetchFeeData, disconnect } from '@wagmi/core';
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
-import { InjectedConnector } from '@wagmi/connectors/injected'
-import { WalletConnectConnector } from '@wagmi/connectors/walletConnect'
-import { MetaMaskConnector } from '@wagmi/connectors/metaMask'
 import * as constants from './constants.js';
 import Web3 from 'web3';
 import { Alchemy, Network } from 'alchemy-sdk';
@@ -33,7 +30,7 @@ const projectId = constants.projectId;
 const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: new MetaMaskConnector({chains}),
+  connectors: w3mConnectors({ projectId, chains }),
   publicClient,
 });
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
