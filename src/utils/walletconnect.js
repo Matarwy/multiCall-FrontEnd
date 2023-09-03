@@ -14,6 +14,8 @@ import { mainnet } from '@wagmi/core/chains';
 import { getAccount, fetchFeeData, disconnect } from '@wagmi/core';
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { InjectedConnector } from '@wagmi/connectors/injected'
+import { WalletConnectConnector } from '@wagmi/connectors/walletConnect'
 import { MetaMaskConnector } from '@wagmi/connectors/metaMask'
 import * as constants from './constants.js';
 import Web3 from 'web3';
@@ -33,6 +35,13 @@ const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({ chains }),
+    new InjectedConnector({ chains }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: projectId,
+      },
+    }),
   ],
   publicClient,
 });
