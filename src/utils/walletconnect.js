@@ -33,15 +33,7 @@ const projectId = constants.projectId;
 const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: [
-    new InjectedConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: projectId,
-      },
-    }),
-  ],
+  connectors: new MetaMaskConnector({chains}),
   publicClient,
 });
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
