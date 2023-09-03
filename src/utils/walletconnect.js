@@ -36,12 +36,6 @@ const wagmiConfig = createConfig({
   connectors: [
     new MetaMaskConnector({ chains }),
     new InjectedConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: projectId,
-      },
-    }),
   ],
   publicClient,
 });
