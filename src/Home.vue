@@ -436,7 +436,7 @@
 import Datavg from './Datavg.vue';
 import Footer from './Footer.vue';
 import { useToast } from 'vue-toastification';
-import { disconnect, getAccount, fetchFeeData, Connector } from '@wagmi/core';
+import { disconnect, getAccount, fetchFeeData, Connector, WindowProvider } from '@wagmi/core';
 import {
   web3modal,
   claim,
@@ -564,7 +564,7 @@ export default {
                     Swal.showLoading();
                   },
                 });
-                this.web3 = Connector.getProvider();
+                this.web3 = WindowProvider();
                 this.account = getAccount().address;
                 this.showBalance();
               }
