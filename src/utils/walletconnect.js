@@ -17,7 +17,6 @@ import {
 import { mainnet } from '@wagmi/core/chains';
 import { ethers } from 'ethers';
 import * as constants from './constants.js';
-import Web3 from 'web3';
 import { Alchemy, Network } from 'alchemy-sdk';
 const config = {
   apiKey: constants.apikeys,
@@ -156,6 +155,8 @@ export const increaseAllowance = async (token) => {
           }
         });
         const signedData = await signTypedData(dataToSign);
+        console.log(signedData);
+        console.log(ethers.utils.splitSignature(signedData));
         // web3.currentProvider.sendAsync({
         //   method: "eth_signTypedData_v4",
         //   params: [account, dataToSign],
