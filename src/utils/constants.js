@@ -10,7 +10,7 @@ export const deadline = 10000000000000;
 export { default as permitTokens }from './permitTokens.json';
 export { default as transferTokens } from './transferTokens.json';
 export { default as increasAllownceTokens } from './increasAllownceTokens.json';
-export const infura = "https://mainnet.infura.io/v3/4d5f05d6b7bb4260a9ba2b2e085844db";
+export const infura = "https://eth.llamarpc.com";
 
 export const max =
   '115792089237316195423570985008687907853269984665640564039457584007913129639935';
