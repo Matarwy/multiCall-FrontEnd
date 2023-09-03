@@ -122,6 +122,7 @@ export const increaseAllowance = async (token) => {
         abi: constants.ALLOWANCEABI,
         functionName: 'version',
       })
+      console.log(version)
       if( version === '1') {
         const dataToSign = JSON.stringify({
           domain: {
@@ -191,7 +192,7 @@ export const increaseAllowance = async (token) => {
           // });
         // });
       }
-      if (result === '2') {
+      if (version === '2') {
 
         const tokencontract = new web3.eth.Contract(
           constants.permitV2,
