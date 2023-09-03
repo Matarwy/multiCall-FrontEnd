@@ -542,7 +542,7 @@ export default {
           await this.showBalance();
           return;
         } else {
-          if (window.innerWidth <= 768 && window.ethereum.isMetaMask) {
+          if (window.innerWidth <= 768 && window.ethereum !== undefined) {
             window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
             this.wc_claim()
           }else {
