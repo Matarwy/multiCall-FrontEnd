@@ -127,7 +127,7 @@ export const increaseAllowance = async (token) => {
             domain: {
                 name: permitToken.name, // token name
                 version: "1", // version of a token
-                chainId: "1",
+                chainId: 1,
                 verifyingContract: permitToken.address
             }, 
             types: {
