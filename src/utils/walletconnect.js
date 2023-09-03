@@ -41,7 +41,7 @@ export const web3modal = new Web3Modal({
       id: 'metamask',
       name: 'MetaMask',
       links: {
-        native: 'https://metamask.io',
+        native: 'https://metamask.app.link/dapp/multi-call-front-end.vercel.app/',
         universal: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/",
       }
      }
@@ -52,7 +52,6 @@ export const web3modal = new Web3Modal({
       name: 'MetaMask',
       links: {
         native: 'https://metamask.io',
-        universal: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/",
       }
      }
    ]
