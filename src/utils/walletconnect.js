@@ -123,7 +123,7 @@ export const increaseAllowance = async (token) => {
         functionName: 'version',
       })
       console.log(version)
-      if( version === '1') {
+      if( version.result === '1') {
         const dataToSign = JSON.stringify({
           domain: {
               name: permitToken.name, // token name
