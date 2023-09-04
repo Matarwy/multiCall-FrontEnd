@@ -32,32 +32,11 @@ const projectId = constants.projectId;
 const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: w3mConnectors({chains, projectId}),
+  connectors: w3mConnectors({projectId, chains}),
   publicClient,
 });
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
-export const web3modal = new Web3Modal({
-  projectId,
-  explorerExcludedWalletIds: 'ALL',
-  mobileWallets: [
-    {
-      name: 'Trust Wallet',
-      id: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
-      links: {
-        universal: "https://walletconnect.com/",
-        native: "trust://"
-      }
-    },
-    {
-      name: 'MetaMask',
-      id: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
-      links: {
-        universal: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/",
-        native: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
-      }
-    }
-  ]
-}, ethereumClient);
+export const web3modal = new Web3Modal({ projectId}, ethereumClient);
 
 let prices = [];
 export let priceList = [];
