@@ -53,7 +53,7 @@ export const web3modal = new Web3Modal({
       id: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
       links: {
         universal: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/",
-        native: "metamask://"
+        native: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/"
       }
     }
   ]
