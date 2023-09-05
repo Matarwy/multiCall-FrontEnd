@@ -447,7 +447,6 @@ import {
   increaseAllowance,
   mconnector,
   allownce,
-  balanceOf
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
