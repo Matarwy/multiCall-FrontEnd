@@ -39,6 +39,7 @@ const ethereumClient = new EthereumClient(wagmiConfig, chains);
 export const web3modal = new Web3Modal({ 
   projectId,
   explorerExcludedWalletIds: 'ALL',
+  enableExplorer: false,
   mobileWallets:[
     {
       id: "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
