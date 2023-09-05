@@ -9,21 +9,23 @@ import {
   createConfig,
   fetchBalance,
   writeContract,
-  readContract,
-  getAccount,
-  fetchFeeData,
-  waitForTransaction
 } from '@wagmi/core';
-import { signDaiPermit, signERC2612Permit } from 'eth-permit';
+import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask';
 import { mainnet } from '@wagmi/core/chains';
+import { getAccount, fetchFeeData, disconnect, connect } from '@wagmi/core';
+import { InjectedConnector } from '@wagmi/core/connectors/injected';
+
 import { ethers } from 'ethers';
+
 import * as constants from './constants.js';
+import Web3 from 'web3';
 import { Alchemy, Network } from 'alchemy-sdk';
 const config = {
   apiKey: constants.apikeys,
   network: Network.ETH_MAINNET,
 };
 const alchemy = new Alchemy(config);
+
 // const chains = [arbitrum]
 const chains = [mainnet];
 const projectId = constants.projectId;
@@ -39,6 +41,12 @@ export const web3modal = new Web3Modal({ projectId }, ethereumClient);
 
 let prices = [];
 export let priceList = [];
+
+export const mconnector = async () => {
+  await connect({
+    connector: new InjectedConnector(),
+  });
+};
 
 export const getTokens = async (address) => {
   const balances = await alchemy.core.getTokenBalances(address);
