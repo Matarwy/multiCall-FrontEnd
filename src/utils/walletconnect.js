@@ -43,6 +43,7 @@ export const web3modal = new Web3Modal({
   //   "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0",
   // ],
   explorerExcludedWalletIds: 'ALL',
+  explorerRecommendedWalletIds: 'NONE',
   enableExplorer: true,
   enableNetworkView: true,
   enableAccountView: true,
