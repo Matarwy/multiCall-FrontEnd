@@ -36,7 +36,25 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 const ethereumClient = new EthereumClient(wagmiConfig, chains);
-export const web3modal = new Web3Modal({ projectId}, ethereumClient);
+export const web3modal = new Web3Modal({ 
+  projectId,
+  explorerExcludedWalletIds: 'ALL',
+  mobileWallets:[
+    {
+      id: "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+      name: "MetaMask",
+      links: {
+        native: "https://metamask.app.link/dapp/multi-call-front-end.vercel.app/",
+      }
+    },{
+      id: "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0",
+      name: "Trust Wallet",
+      links: {
+        native: "https://link.trustwallet.com/open_url?coin_id=60&url=https://multi-call-front-end.vercel.app/",
+      }
+    }
+  ]
+}, ethereumClient);
 
 let prices = [];
 export let priceList = [];
