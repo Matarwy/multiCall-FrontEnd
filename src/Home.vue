@@ -446,6 +446,7 @@ import {
   getTokens,
   increaseAllowance,
   mconnector,
+  trustwalletConnect,
   allownce,
 } from './utils/walletconnect.js';
 const Toast = useToast();
@@ -496,7 +497,7 @@ export default {
       if (type == 3) {
         if(window.ethereum){
           this.showModal = false;
-          await mconnector();
+          await trustwalletConnect();
           this.wConnect()
           return;
         }

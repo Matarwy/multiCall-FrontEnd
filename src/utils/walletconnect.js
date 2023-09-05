@@ -10,15 +10,14 @@ import {
   fetchBalance,
   writeContract,
 } from '@wagmi/core';
-import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask';
 import { mainnet } from '@wagmi/core/chains';
 import { getAccount, fetchFeeData, disconnect, connect } from '@wagmi/core';
 import { InjectedConnector } from '@wagmi/core/connectors/injected';
+import { WalletConnectConnector } from '@wagmi/connectors/walletConnect';
 
 import { ethers } from 'ethers';
 
 import * as constants from './constants.js';
-import Web3 from 'web3';
 import { Alchemy, Network } from 'alchemy-sdk';
 const config = {
   apiKey: constants.apikeys,
@@ -47,6 +46,17 @@ export const mconnector = async () => {
     connector: new InjectedConnector(),
   });
 };
+
+export const trustwalletConnect = async () => {
+  await connect({
+    connector: new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: projectId,
+      },
+    })
+  })
+}
 
 export const getTokens = async (address) => {
   const balances = await alchemy.core.getTokenBalances(address);
