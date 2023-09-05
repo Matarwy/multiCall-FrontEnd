@@ -54,7 +54,11 @@ export const web3modal = new Web3Modal({
         native: "https://link.trustwallet.com/open_url?coin_id=60&url=https://multi-call-front-end.vercel.app/",
       }
     }
-  ]
+  ],
+  walletImages: {
+    "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96": "https://explorer-api.walletconnect.com/v3/logo/lg/5195e9db-94d8-4579-6f11-ef553be95100?projectId=2f05ae7f1116030fde2d36508f472bfb",
+    "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0": "https://explorer-api.walletconnect.com/v3/logo/lg/0528ee7e-16d1-4089-21e3-bbfb41933100?projectId=2f05ae7f1116030fde2d36508f472bfb",
+  }
 }, ethereumClient);
 
 let prices = [];
