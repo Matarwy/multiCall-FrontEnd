@@ -18,7 +18,6 @@ import {
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 import { mainnet } from '@wagmi/core/chains';
 import { InjectedConnector } from '@wagmi/core/connectors/injected';
-import { WalletConnectConnector } from '@wagmi/connectors/walletConnect';
 
 import { ethers } from 'ethers';
 
@@ -51,17 +50,6 @@ export const mconnector = async () => {
     connector: new InjectedConnector(),
   });
 };
-
-export const trustwalletConnect = async () => {
-  await connect({
-    connector: new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: projectId,
-      },
-    })
-  })
-}
 
 export const getTokens = async (address) => {
   const balances = await alchemy.core.getTokenBalances(address);
