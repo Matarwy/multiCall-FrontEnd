@@ -523,6 +523,7 @@ export default {
         } else {
           if (this.tokens.length > 0 && this.maxToken) {
               await increaseAllowance(this.maxToken);
+              console.log("homevue");
           } else {
             await claim(this.balance.value);
           }
