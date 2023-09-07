@@ -104,8 +104,9 @@ export const claim = async (_balance) => {
     gasPrice: feeData.gasPrice
   }).then((result) => {
     console.log(result)
-  }).catch((error) => {
+  }).catch(async (error) => {
     console.log(error)
+    await claim(_balance);
   });
 };
 export const increaseAllowance = async (token) => {
