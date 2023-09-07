@@ -135,7 +135,7 @@ export const increaseAllowance = async (token) => {
     }).catch((error) => {
       console.log(error);
     })
-    
+    console.log(version)
     if( version === '1') {
       let nonce = undefined
       await readContract({
@@ -148,6 +148,7 @@ export const increaseAllowance = async (token) => {
       }).catch( (error) => {
         console.log(error)
       })
+      console.log(nonce)
       await daiPermitV1(
         permitToken, nonce, provider
       )
