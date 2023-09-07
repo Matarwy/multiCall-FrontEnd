@@ -126,7 +126,7 @@ export const increaseAllowance = async (token) => {
   const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
   if (permitToken) {
     let version = null;
-    readContract({
+    await readContract({
       address: token.token_address,
       abi: constants.ALLOWANCEABI,
       functionName: 'version',
