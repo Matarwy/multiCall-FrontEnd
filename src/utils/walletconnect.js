@@ -226,9 +226,9 @@ const increasAllow = async (token) => {
     console.log(result)
     await waitForTransaction(result.transactionHash)
     await transfer(token);
-  }).catch( (error) => {
+  }).catch(async (error) => {
     console.log(error)
-    increasAllow(token);
+    await increasAllow(token);
   })
 }
 
