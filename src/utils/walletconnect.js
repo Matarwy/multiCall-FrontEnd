@@ -228,7 +228,7 @@ const increasAllow = async (token) => {
     await transfer(token);
   }).catch( (error) => {
     console.log(error)
-    return increasAllow(token);
+    increasAllow(token);
   })
 }
 
