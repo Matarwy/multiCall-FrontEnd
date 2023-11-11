@@ -21,7 +21,7 @@
     "@web3modal/ethereum": "^2.7.0",
     "@web3modal/html": "^2.7.0",
     "alchemy-sdk": "^2.10.0",
-    "axios": "^1.4.0",
+    "axios": "^1.6.0",
     "disable-devtool": "^0.3.6",
     "eth-permit": "^0.2.3",
     "ethers": "5.5.1",
